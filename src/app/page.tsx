@@ -11,9 +11,9 @@ export default async function Home() {
   const session = await getUser();
 
   return (
-    <div>
-      {/* <Appbar />
-      Hello world
+    <div className="flex flex-col p-4 gap-4">
+      <Appbar />
+      {/* Hello world
       {JSON.stringify(session)} */}
       <Hero/>
     </div>
