@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "../ui/button";
-import { ProductDetails, STAGES } from "../constants/type";
+import { ProductDetailsProp, STAGES } from "../constants/type";
 import ProductDetail from "./ProductDetail";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,14 +14,11 @@ export default function Hero({}: Props) {
     (state: any) => state.appConfigReducer.toastData
   );
 
-  const [details, setDetails] = useState<ProductDetails>({
-    name: "SAMSUNG GT-1200  (Black)",
-    price: "₹6,380",
-    img: "testimg",
-    // const [details, setDetails] = useState<ProductDetails>({
-    //   name: "",
-    //   price: "",
-    //   img: "",
+  const [details, setDetails] = useState<ProductDetailsProp>({
+    name: "",
+    currency: "",
+    price: 0,
+    image: "",
   });
   const [url, setUrl] = useState("");
 
@@ -52,7 +49,7 @@ export default function Hero({}: Props) {
             type: "success",
           });
         }
-        toast.success(toastData.message.message)
+        toast.success(toastData.message.message);
         break;
 
       case STAGES.FAILURE:

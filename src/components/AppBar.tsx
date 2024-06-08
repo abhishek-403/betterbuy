@@ -1,15 +1,23 @@
 "use client";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 export const Appbar = () => {
+  const router = useRouter();
+
   return (
     <div className="flex justify-between items-center px-10">
       <div>
         <p className="text-2xl font-bold">BetterBuy</p>
       </div>
       <div className="flex items-center">
-        <Signup/>
+        <Signup />
         {/* <ToggleTheme /> */}
+        <div>
+          <Button onClick={() => router.push("/myproducts")}>
+            Products
+          </Button>
+        </div>
       </div>
     </div>
   );

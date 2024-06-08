@@ -1,9 +1,10 @@
 import { StaticImageData } from "next/image";
 
-export type ProductDetails = {
+export type ProductDetailsProp = {
   name: string;
-  price: string;
-  img: string ;
+  price: number;
+  currency: string;
+  image: string ;
 };
 
 export enum STAGES{

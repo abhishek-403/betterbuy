@@ -18,8 +18,8 @@ export enum HOSTNAME {
 async function POST(req: Request, res: Response) {
   try {
     let { url } = await req.json();
-    console.log("url",url);
-    
+    console.log("url", url);
+
     const host: HOSTNAME = getHost(url);
     let prodDetails;
     if (host === HOSTNAME.AMAZON) {
@@ -66,28 +66,34 @@ async function getAmazon(url: string) {
       const name = document.querySelector("#productTitle")?.textContent;
 
       // @ts-ignore
-      // const price = document.querySelector(
-      //   ".a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay"
-      // )?.textContent;
 
-      const price = document.querySelector(
+      const str = document.querySelector(
         ".a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay"
       )?.textContent;
-      // const price = document.querySelector(".a-price-whole")?.textContent;
+
       // @ts-ignore
 
       const images = document.querySelectorAll("#landingImage");
       // @ts-ignore
       const img = Array.from(images).map((img) => img.src);
 
-      return { name, price, img: img[0] };
+      return { name, str, img: img[0] };
     } catch (error) {
       console.log(error);
     }
   });
 
   await browser.close();
-  return item;
+  let str = item?.str;
+  let currency;
+  if (str!.charAt(0) === "$" || str!.charAt(0) === "₹") {
+    currency = str!.charAt(0);
+  }
+    const strr = str!.slice(1).replace(/,/g, "");
+    const price = parseFloat(strr);
+  let itemFinal = { name: item?.name, image: item?.img, price, currency };
+
+  return itemFinal;
 }
 
 async function getFlipkart(url: string) {
@@ -109,21 +115,30 @@ async function getFlipkart(url: string) {
       const name = itemDiv.querySelector(".VU-ZEz")?.textContent;
 
       // @ts-ignore
-      const price = itemDiv.querySelector(".Nx9bqj.CxhGGd")?.textContent;
+      const str = itemDiv.querySelector(".Nx9bqj.CxhGGd")?.textContent;
       // @ts-ignore
 
       const images = document.querySelectorAll(".DByuf4.IZexXJ.jLEJ7H");
       // @ts-ignore
       const img = Array.from(images).map((img) => img.src);
 
-      return { name, price, img: img[0] };
+      return { name, str, img: img[0] };
     } catch (error) {
       console.log(error);
     }
   });
 
   await browser.close();
-  return item;
+  let str = item?.str;
+  let currency;
+  if (str!.charAt(0) === "$" || str!.charAt(0) === "₹") {
+    currency = str!.charAt(0);
+  }
+  const strr = str!.slice(1).replace(/,/g, "");
+  const price = parseFloat(strr);
+  let itemFinal = { name: item?.name, image: item?.img, price, currency };
+
+  return itemFinal;
 }
 
 function getHost(url: string) {

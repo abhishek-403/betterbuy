@@ -12,7 +12,7 @@ async function getUser() {
 const prisma = new PrismaClient();
 
 async function POST(req: any, res: NextApiResponse) {
-  const { name, amount, image } = await req.json();
+  const { name, price,currency, image } = await req.json();
 
   const session = await getUser();
 
@@ -42,13 +42,14 @@ async function POST(req: any, res: NextApiResponse) {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return NextResponse.json(
+        { response: "not found" },
+        {
+          status: 200,
+        }
+      );
     }
-    let currency;
-    if (amount.charAt(0) === "$" || amount.charAt(0) === "₹") {
-      currency = amount.charAt(0);
-    }
-    const price = parseFloat(amount.slice(1));
+   
 
     const newProduct = await prisma.product.create({
       data: {
@@ -56,9 +57,9 @@ async function POST(req: any, res: NextApiResponse) {
         price,
         image,
         currency,
-        owner:{
-          connect:{email}
-        }
+        owner: {
+          connect: { email },
+        },
       },
     });
 
@@ -71,7 +72,7 @@ async function POST(req: any, res: NextApiResponse) {
     );
   } catch (e) {
     console.log(e);
-    
+
     return NextResponse.json(
       { response: e },
       {
@@ -80,4 +81,4 @@ async function POST(req: any, res: NextApiResponse) {
     );
   }
 }
-export { POST };
+export { POST  };
