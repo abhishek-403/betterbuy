@@ -1,23 +1,41 @@
 import React from "react";
-import { ProductDetails } from "../constants/type";
+import { ProductDetails, STAGES } from "../constants/type";
 import Image from "next/image";
 import image from "@/components/assets/testimg.jpg";
 import { Button } from "../ui/button";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { showToast } from "../redux/slices/appConfiigSlice";
 type Props = {
   details: ProductDetails;
 };
 
 export default function ProductDetail({ details }: Props) {
+  const dispatch = useDispatch();
+
   function handleTrack() {
-    toast("taost");
+
+    dispatch(
+      showToast({
+        type: STAGES.LOADING,
+        message: { message: "Loading..." },
+      })
+    );
+
+    dispatch(
+      showToast({
+        type: STAGES.SUCCESS,
+        message: { message: "Success" },
+      })
+    );
+
+    
   }
   if (!details.name) {
     return <div>No details</div>;
   }
   return (
     <div className="flex gap-2 ">
-  
       <div className="flex  ">
         {/* {details.img && ( */}
         {details.img || (

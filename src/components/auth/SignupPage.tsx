@@ -8,29 +8,18 @@ type Props = {};
 export default function SignupPage({}: Props) {
   const router = useRouter();
   return (
-    <div>
-      Signup
-      <div>
-        <input placeholder="email" />
-        <input placeholder="password" />
-        <button
-          onClick={async () => {
-            let res = await signIn("credentials", {
-              username: "emailddd",
-              password: "password.current",
-              redirect: false,
-            });
-            if (!res?.error) {
-              router.push("/");
-            }
-          }}
-        >
-          submit
-        </button>
-      </div>
-      <div>
-        <button onClick={() => signIn("google")}>Google</button>
-        <button onClick={() => signIn("github")}>github</button>
+    <div className="flex w-full justify-center mt-[100px]">
+      <div className=" flex flex-col items-center gap-4 border-2 p-2  ">
+        <div>Signup</div>
+      
+        <div className="flex flex-col gap-4 w-[350px]">
+          <div className="p-2 text-lg bg-black border-2  text-center items-center justify-center rounded-full">
+            <button onClick={() => signIn("google")}>Google</button>
+          </div>
+          <div className="p-2 text-lg bg-black border-2  text-center items-center justify-center rounded-full">
+            <button onClick={() => signIn("github")}>Github</button>
+          </div>
+        </div>
       </div>
     </div>
   );

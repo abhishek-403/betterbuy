@@ -20,7 +20,7 @@ export const NEXT_AUTH_CONFIG = {
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,

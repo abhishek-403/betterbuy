@@ -13,8 +13,8 @@ export default async function Home() {
   return (
     <div className="flex flex-col p-4 gap-4">
       <Appbar />
-      {/* Hello world
-      {JSON.stringify(session)} */}
+      Hello world
+      {JSON.stringify(session)}
       <Hero/>
     </div>
   );

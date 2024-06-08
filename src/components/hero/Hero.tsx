@@ -1,16 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "../ui/button";
-import { ProductDetails } from "../constants/type";
+import { ProductDetails, STAGES } from "../constants/type";
 import ProductDetail from "./ProductDetail";
-import image from '@/components/assets/testimg.jpg'
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 type Props = {};
 
-
 export default function Hero({}: Props) {
+  const toastData = useSelector(
+    (state: any) => state.appConfigReducer.toastData
+  );
+
   const [details, setDetails] = useState<ProductDetails>({
     name: "SAMSUNG GT-1200  (Black)",
     price: "₹6,380",
@@ -34,6 +37,26 @@ export default function Hero({}: Props) {
       console.log(e);
     }
   }
+
+  useEffect(() => {
+    switch (toastData.type) {
+      case STAGES.LOADING:
+        toast.loading(toastData.message.message);
+        break;
+
+      case STAGES.SUCCESS:
+        toast.success(toastData.message.message);
+        break;
+        
+      case STAGES.FAILURE:
+        toast.error(toastData.message.message);
+        break;
+
+
+      default:
+    }
+  }, [toastData]);
+
   return (
     <div className="flex flex-col ">
       <ToastContainer
