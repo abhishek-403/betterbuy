@@ -17,7 +17,7 @@ export default function Hero({}: Props) {
   const [details, setDetails] = useState<ProductDetails>({
     name: "SAMSUNG GT-1200  (Black)",
     price: "₹6,380",
-    img: "",
+    img: "testimg",
     // const [details, setDetails] = useState<ProductDetails>({
     //   name: "",
     //   price: "",
@@ -39,19 +39,25 @@ export default function Hero({}: Props) {
   }
 
   useEffect(() => {
+    let id;
     switch (toastData.type) {
       case STAGES.LOADING:
-        toast.loading(toastData.message.message);
+        id = toast.loading(toastData.message.message);
         break;
 
       case STAGES.SUCCESS:
-        toast.success(toastData.message.message);
+        if (id) {
+          toast.update(id, {
+            render: toastData.message.message,
+            type: "success",
+          });
+        }
+        toast.success(toastData.message.message)
         break;
-        
+
       case STAGES.FAILURE:
         toast.error(toastData.message.message);
         break;
-
 
       default:
     }

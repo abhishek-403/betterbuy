@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { showToast } from "../redux/slices/appConfiigSlice";
+import axios from "axios";
 type Props = {
   details: ProductDetails;
 };
@@ -13,14 +14,22 @@ type Props = {
 export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
 
-  function handleTrack() {
+  async function handleTrack() {
+    // dispatch(
+    //   showToast({
+    //     type: STAGES.LOADING,
+    //     message: { message: "Loading..." },
+    //   })
+    // );
 
-    dispatch(
-      showToast({
-        type: STAGES.LOADING,
-        message: { message: "Loading..." },
-      })
-    );
+
+    let data = await axios.post("/api/user", {
+      name: details.name,
+      amount: details.price,
+      image: details.img,
+   
+    });
+    console.log(data);
 
     dispatch(
       showToast({
@@ -28,8 +37,6 @@ export default function ProductDetail({ details }: Props) {
         message: { message: "Success" },
       })
     );
-
-    
   }
   if (!details.name) {
     return <div>No details</div>;

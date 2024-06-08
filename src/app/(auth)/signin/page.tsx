@@ -9,7 +9,6 @@ type Props = {}
 export default async function Signup({ }: Props) {
     
     const session = await getServerSession(NEXT_AUTH_CONFIG);
-    console.log("dse",session);
     if (session?.user) {
         redirect('/');
     }

@@ -18,7 +18,8 @@ export enum HOSTNAME {
 async function POST(req: Request, res: Response) {
   try {
     let { url } = await req.json();
-
+    console.log("url",url);
+    
     const host: HOSTNAME = getHost(url);
     let prodDetails;
     if (host === HOSTNAME.AMAZON) {
