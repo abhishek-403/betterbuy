@@ -4,11 +4,13 @@ export type ProductDetailsProp = {
   name: string;
   price: number;
   currency: string;
-  image: string ;
+  image: string;
+  id: number;
 };
 
 export enum STAGES{
     LOADING,
     SUCCESS,
-    FAILURE
+    FAILURE,
+    PROMISE
 }

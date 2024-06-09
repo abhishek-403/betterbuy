@@ -7,6 +7,7 @@ import ProductDetail from "./ProductDetail";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
+import { ModalComponent } from "../Modal";
 type Props = {};
 
 export default function Hero({}: Props) {
@@ -19,6 +20,7 @@ export default function Hero({}: Props) {
     currency: "",
     price: 0,
     image: "",
+    id:0,
   });
   const [url, setUrl] = useState("");
 
@@ -43,17 +45,18 @@ export default function Hero({}: Props) {
         break;
 
       case STAGES.SUCCESS:
-        if (id) {
-          toast.update(id, {
-            render: toastData.message.message,
-            type: "success",
-          });
-        }
+        
         toast.success(toastData.message.message);
         break;
 
       case STAGES.FAILURE:
         toast.error(toastData.message.message);
+        break;
+
+      case STAGES.PROMISE:
+        console.log(toastData);
+        
+        toast.promise(toastData.message.request,toastData.message.info );
         break;
 
       default:
@@ -94,6 +97,7 @@ export default function Hero({}: Props) {
       </div>
 
       <ProductDetail details={details} />
+      <ModalComponent title="This is test" message="New message"/>
     </div>
   );
 }

@@ -15,28 +15,41 @@ export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
 
   async function handleTrack() {
-    // dispatch(
-    //   showToast({
-    //     type: STAGES.LOADING,
-    //     message: { message: "Loading..." },
-    //   })
-    // );
-
-    let data = await axios.post("/api/addproduct", {
-      name: details.name,
-      currency: details.currency,
-      price: details.price,
-      image: details.image,
+    let request = new Promise(async (resolve, reject) => {
+      try {
+        await axios.post("/api/addproduct", {
+          name: details.name,
+          currency: details.currency,
+          price: details.price,
+          image: details.image,
+        });
+        resolve;
+      } catch (error) {
+        reject;
+      }
     });
-
-    console.log(data.data);
 
     dispatch(
       showToast({
-        type: STAGES.SUCCESS,
-        message: { message: "Success" },
+        type: STAGES.PROMISE,
+        message: {
+          info: {
+            pending: "Adding Product",
+            success: "Product added 👌",
+            error: "Error occured 🤯",
+          },
+          request,
+        },
       })
     );
+    // console.log(data.data);
+
+    // dispatch(
+    //   showToast({
+    //     type: STAGES.SUCCESS,
+    //     message: { message: "Success" },
+    //   })
+    // );
   }
   if (!details.name) {
     return <div>No details</div>;

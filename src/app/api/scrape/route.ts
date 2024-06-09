@@ -18,7 +18,6 @@ export enum HOSTNAME {
 async function POST(req: Request, res: Response) {
   try {
     let { url } = await req.json();
-    console.log("url", url);
 
     const host: HOSTNAME = getHost(url);
     let prodDetails;
@@ -67,9 +66,9 @@ async function getAmazon(url: string) {
 
       // @ts-ignore
 
-      const str = document.querySelector(
-        ".a-price.aok-align-center.reinventPricePriceToPayMargin.priceToPay"
-      )?.textContent;
+      const currency = document.querySelector(".a-price-symbol")?.textContent;
+      const price = document.querySelector(".a-price-whole")?.textContent;
+      const fraction = document.querySelector(".a-price-fraction")?.textContent;
 
       // @ts-ignore
 
@@ -77,21 +76,23 @@ async function getAmazon(url: string) {
       // @ts-ignore
       const img = Array.from(images).map((img) => img.src);
 
-      return { name, str, img: img[0] };
+      return { name, price:`${price}${fraction}`, currency, img: img[0] };
     } catch (error) {
       console.log(error);
     }
   });
 
   await browser.close();
-  let str = item?.str;
-  let currency;
-  if (str!.charAt(0) === "$" || str!.charAt(0) === "₹") {
-    currency = str!.charAt(0);
-  }
-    const strr = str!.slice(1).replace(/,/g, "");
-    const price = parseFloat(strr);
-  let itemFinal = { name: item?.name, image: item?.img, price, currency };
+
+  const strr = item!.price.replace(/,/g, "");
+  let price = parseFloat(strr);
+
+  let itemFinal = {
+    name: item?.name,
+    image: item?.img,
+    price,
+    currency: item?.currency,
+  };
 
   return itemFinal;
 }

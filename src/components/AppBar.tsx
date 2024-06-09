@@ -2,13 +2,14 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import Link from "next/link";
 export const Appbar = () => {
   const router = useRouter();
 
   return (
-    <div className="flex justify-between items-center px-10">
+    <div className="flex justify-between items-center px-10 border-2 rounded-full py-3">
       <div>
-        <p className="text-2xl font-bold">BetterBuy</p>
+        <Link href='/' className="text-2xl font-bold">BetterBuy</Link>
       </div>
       <div className="flex items-center">
         <Signup />
