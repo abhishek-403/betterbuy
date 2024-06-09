@@ -20,7 +20,8 @@ export default function Hero({}: Props) {
     currency: "",
     price: 0,
     image: "",
-    id:0,
+    url: "",
+    id: 0,
   });
   const [url, setUrl] = useState("");
 
@@ -31,21 +32,19 @@ export default function Hero({}: Props) {
         url,
       });
       console.log(response.data.response);
-      setDetails(response.data.response);
+      setDetails({ ...response.data.response, url });
     } catch (e) {
       console.log(e);
     }
   }
 
   useEffect(() => {
-    let id;
     switch (toastData.type) {
       case STAGES.LOADING:
-        id = toast.loading(toastData.message.message);
+        toast.loading(toastData.message.message);
         break;
 
       case STAGES.SUCCESS:
-        
         toast.success(toastData.message.message);
         break;
 
@@ -54,9 +53,7 @@ export default function Hero({}: Props) {
         break;
 
       case STAGES.PROMISE:
-        console.log(toastData);
-        
-        toast.promise(toastData.message.request,toastData.message.info );
+        toast.promise(toastData.message.request, toastData.message.info);
         break;
 
       default:
@@ -64,20 +61,17 @@ export default function Hero({}: Props) {
   }, [toastData]);
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col px-20 ">
       <ToastContainer
         position="bottom-right"
         autoClose={1000}
-        hideProgressBar={false}
-        newestOnTop={false}
+        hideProgressBar
+        newestOnTop
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss={false}
-        draggable
-        pauseOnHover={false}
         theme="dark"
       />
-      <div className="w-full flex gap-4 items-center ">
+      <div className=" flex gap-4 items-center ">
         <input
           className="w-full  h-12 px-4 p-2 rounded-xl border-2 border-[#ffffff22] focus:outline outline-[#414141]"
           placeholder="Enter product URL"
@@ -97,7 +91,7 @@ export default function Hero({}: Props) {
       </div>
 
       <ProductDetail details={details} />
-      <ModalComponent title="This is test" message="New message"/>
+      {/* <ModalComponent title="This is test" message="New message" /> */}
     </div>
   );
 }

@@ -1,33 +1,35 @@
+//@ts-nocheck
+import { ProductDetailsProp } from "@/components/constants/type";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-// export const config = {
-//   api: {
-//     bodyParser: true,
-//   },
-// };
 
 type ResponseData = {
   message: string;
 };
-export enum HOSTNAME {
-  FLIPKART,
-  AMAZON,
-  INVALID,
-  NA,
-}
+
+export const HOSTS : { [key: string]: string } = {
+  Flipkart: "flipkart",
+  Amazon: "amazon",
+  Invalid:"invalid",
+  NA:"na",
+};
+
+
 async function POST(req: Request, res: Response) {
   try {
     let { url } = await req.json();
 
-    const host: HOSTNAME = getHost(url);
+    const host = getHost(url);
+    
     let prodDetails;
-    if (host === HOSTNAME.AMAZON) {
+    if (host === HOSTS.Amazon) {
+      
       prodDetails = await getAmazon(url);
-    } else if (host === HOSTNAME.FLIPKART) {
+    } else if (host === HOSTS.flipkart) {
       prodDetails = await getFlipkart(url);
-    } else if (host === HOSTNAME.NA) {
+    } else if (host === HOSTS.NA) {
       prodDetails = { message: "Service form this host not available" };
-    } else if (host === HOSTNAME.INVALID) {
+    } else if (host === HOSTS.Invalid) {
       prodDetails = { message: "Invalid url" };
     }
     return NextResponse.json(
@@ -59,24 +61,22 @@ async function getAmazon(url: string) {
   });
   const item = await page.evaluate(() => {
     try {
-      const itemDiv = document.querySelector("#centerCol");
-
-      //@ts-ignore
       const name = document.querySelector("#productTitle")?.textContent;
-
-      // @ts-ignore
 
       const currency = document.querySelector(".a-price-symbol")?.textContent;
       const price = document.querySelector(".a-price-whole")?.textContent;
       const fraction = document.querySelector(".a-price-fraction")?.textContent;
 
-      // @ts-ignore
-
       const images = document.querySelectorAll("#landingImage");
-      // @ts-ignore
+
       const img = Array.from(images).map((img) => img.src);
 
-      return { name, price:`${price}${fraction}`, currency, img: img[0] };
+      let tempprice = `${price}.${fraction}`;
+      if (price?.includes(".")) {
+        tempprice = `${price}${fraction}`;
+      }
+
+      return { name, price: tempprice, currency, img: img[0] };
     } catch (error) {
       console.log(error);
     }
@@ -92,6 +92,7 @@ async function getAmazon(url: string) {
     image: item?.img,
     price,
     currency: item?.currency,
+    provider: HOSTS.Amazon,
   };
 
   return itemFinal;
@@ -112,15 +113,12 @@ async function getFlipkart(url: string) {
     try {
       const itemDiv = document.querySelector(".C7fEHH");
 
-      //@ts-ignore
       const name = itemDiv.querySelector(".VU-ZEz")?.textContent;
 
-      // @ts-ignore
       const str = itemDiv.querySelector(".Nx9bqj.CxhGGd")?.textContent;
-      // @ts-ignore
 
       const images = document.querySelectorAll(".DByuf4.IZexXJ.jLEJ7H");
-      // @ts-ignore
+
       const img = Array.from(images).map((img) => img.src);
 
       return { name, str, img: img[0] };
@@ -137,7 +135,13 @@ async function getFlipkart(url: string) {
   }
   const strr = str!.slice(1).replace(/,/g, "");
   const price = parseFloat(strr);
-  let itemFinal = { name: item?.name, image: item?.img, price, currency };
+  let itemFinal = {
+    provider: HOSTS.Flipkart,
+    name: item?.name,
+    image: item?.img,
+    price,
+    currency,
+  };
 
   return itemFinal;
 }
@@ -148,14 +152,14 @@ function getHost(url: string) {
     const hostname = parsedUrl.hostname;
 
     if (hostname.includes("amazon")) {
-      return HOSTNAME.AMAZON;
+      return HOSTS.Amazon;
     } else if (hostname.includes("flipkart")) {
-      return HOSTNAME.FLIPKART;
+      return HOSTS.flipkart;
     } else {
-      return HOSTNAME.NA;
+      return HOSTS.NA;
     }
   } catch (error) {
-    return HOSTNAME.INVALID;
+    return HOSTS.Invalid;
   }
 }
 

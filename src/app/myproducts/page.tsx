@@ -4,33 +4,8 @@ import { ProductDetailsProp } from "../../components/constants/type";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Appbar } from "@/components/AppBar";
+import Link from "next/link";
 type Props = {};
-const testList = [
-  {
-    createdAt: "2024-06-08T14:24:34.884Z",
-    currency: "₹",
-    id: 3,
-    image:
-      "https://rukminim2.flixcart.com/image/416/416/xif0q/headphone/r/m/g/-original-imahy33zyhngucsh.jpeg?q=70&crop=false",
-    name: "boAt Immortal 131 w/ Beast Mode(40ms Low Latency), 40 Hours Playback & RGB Lights Bluetooth Headset  (Black sabre, True Wireless)",
-    ownerId: "abhishek60501@gmail.com",
-    price: 1,
-    provider: null,
-    updatedAt: "2024-06-08T14:24:34.884Z",
-  },
-  {
-    createdAt: "2024-06-08T14:28:12.898Z",
-    currency: "₹",
-    id: 4,
-    image:
-      "https://rukminim2.flixcart.com/image/416/416/xif0q/washing-machine-new/d/4/l/-original-imagzzf7hpvrsabu.jpeg?q=70&crop=false",
-    name: "Voltas Beko by A Tata Product 9 kg washing machine with Soft Closing door, Water proof IPX4 protection, Special Pulsator and Double Waterfall Semi Automatic Top Load Black, Grey  (WTT90UDX/BKGR4KGTD)",
-    ownerId: "abhishek60501@gmail.com",
-    price: 12690,
-    provider: null,
-    updatedAt: "2024-06-08T14:28:12.898Z",
-  },
-];
 export default function MyProducts({}: Props) {
   const [productList, setProductList] = useState<ProductDetailsProp[]>([]);
   useEffect(() => {
@@ -38,9 +13,16 @@ export default function MyProducts({}: Props) {
   }, []);
 
   async function fetchProducts() {
-    let p = await axios.get("/api/getproducts");
-    setProductList(p.data.response);
-    console.log(p.data.response);
+    try {
+      let p = await axios.get("/api/getproducts");
+      setProductList(p.data.response);
+      console.log(p.data.response);
+      
+    } catch (error) {
+      console.log(error);
+      
+      
+    }
   }
   return (
     <div className="px-10">
@@ -50,7 +32,7 @@ export default function MyProducts({}: Props) {
       <div></div>
       <div className="flex flex-wrap gap-8">
         {productList.map((product, i) => {
-          return <ProductCard key={i} {...product}  fetchProducts={fetchProducts}/>;
+          return <ProductCard key={i} {...product} id={product.id}  fetchProducts={fetchProducts}/>;
         })}
       </div>
     </div>
@@ -59,10 +41,11 @@ export default function MyProducts({}: Props) {
 
 interface ProductCardProps extends ProductDetailsProp {
   fetchProducts: () => void;
+ id:number;
 }
 const TITLE_LENGTH = 70;
 function ProductCard(
-  { name, price, image, currency, id,fetchProducts }: ProductCardProps,
+  { name, price, image, currency, url,id,fetchProducts }: ProductCardProps,
 ) {
   async function removeProduct() {
     try {
@@ -95,9 +78,9 @@ function ProductCard(
         </div>
       </div>
       <div className="w-full justify-between flex mt-4 gap-2  ">
-        <div className="flex-1">
+        <Link href={url} target="_blank" className="flex-1">
           <Button variant={"secondary"}>Buy now</Button>
-        </div>
+        </Link>
         <Button variant={"default"}>More info</Button>
         <Button variant={"destructive"} onClick={removeProduct}>
           Remove{" "}

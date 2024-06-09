@@ -12,31 +12,35 @@ async function getUser() {
 const prisma = new PrismaClient();
 
 async function POST(req: any, res: NextApiResponse) {
-  const session = await getUser();
-
-  if (!session) {
-    return NextResponse.json(
-      { response: "Invalid" },
-      {
-        status: 200,
-      }
-    );
-  }
-
-  const email = session.user?.email;
-  const { id } = await req.json();
-
-  if (!email) {
-    return NextResponse.json(
-      { response: "not found" },
-      {
-        status: 200,
-      }
-    );
-  }
-
   try {
-    // Find the user by email
+    const session = await getUser();
+
+    if (!session) {
+      return NextResponse.json(
+        { response: "Invalid" },
+        {
+          status: 200,
+        }
+      );
+    }
+
+    const email = session.user?.email;
+    const { id } = await req.json();
+
+    if (!email) {
+      return NextResponse.json(
+        { response: "not found" },
+        {
+          status: 200,
+        }
+      );
+    }
+
+
+    await prisma.pricecheckpoints.deleteMany({
+      where: { id },
+    });
+
     const user = await prisma.product.delete({
       where: {
         id,

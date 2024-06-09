@@ -15,19 +15,15 @@ export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
 
   async function handleTrack() {
-    let request = new Promise(async (resolve, reject) => {
-      try {
-        await axios.post("/api/addproduct", {
-          name: details.name,
-          currency: details.currency,
-          price: details.price,
-          image: details.image,
-        });
-        resolve;
-      } catch (error) {
-        reject;
-      }
-    });
+    let request = axios.post("/api/addproduct", {
+        name: details.name,
+        price: details.price,
+        currency: details.currency,
+        image: details.image,
+        provider:details.provider,
+        url:details.url,
+      });
+   
 
     dispatch(
       showToast({
@@ -42,17 +38,9 @@ export default function ProductDetail({ details }: Props) {
         },
       })
     );
-    // console.log(data.data);
-
-    // dispatch(
-    //   showToast({
-    //     type: STAGES.SUCCESS,
-    //     message: { message: "Success" },
-    //   })
-    // );
   }
   if (!details.name) {
-    return <div>No details</div>;
+    return <div className="flex  m-10 items-center justify-center">No details</div>;
   }
   return (
     <div className="flex gap-2 ">
