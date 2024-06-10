@@ -24,8 +24,6 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
       const newprice = await getPrice(product.url);
       const receiverEmail = product.ownerId;
 
-
-       
       if (!newprice) return NextResponse.json("erro");
 
       //updating products table
@@ -50,20 +48,18 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
             alltimelowprice: newprice,
           },
         });
-        
+
         // send email
 
+        const formatted = formatPrice(newprice);
 
-        // const formatted = formatPrice(newprice);
-
-        // generateEmail({
-        //   receiverEmail,
-        //   img: product.image,
-        //   link: product.url,
-        //   title: product.name,
-        //   price: `${product.currency}${formatted}`,
-        // });
-
+        generateEmail({
+          receiverEmail,
+          img: product.image,
+          link: product.url,
+          title: product.name,
+          price: `${product.currency}${formatted}`,
+        });
       }
 
       //creating new checkpoint
