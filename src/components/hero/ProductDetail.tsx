@@ -40,7 +40,8 @@ export default function ProductDetail({ details }: Props) {
     );
   }
   if (!details.name) {
-    return <div className="flex  m-10 items-center justify-center">No details</div>;
+    // return <div className="flex  m-10 items-center justify-center">No details</div>;
+    return
   }
   return (
     <div className="flex gap-2 ">

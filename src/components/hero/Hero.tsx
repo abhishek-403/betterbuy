@@ -6,8 +6,10 @@ import { ProductDetailsProp, STAGES } from "../constants/type";
 import ProductDetail from "./ProductDetail";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ModalComponent } from "../Modal";
+import { getheroProducts } from "../redux/slices/appConfiigSlice";
+import { ProductCard } from "@/app/myproducts/page";
 type Props = {};
 
 export default function Hero({}: Props) {
@@ -39,29 +41,11 @@ export default function Hero({}: Props) {
   }
 
   useEffect(() => {
-    switch (toastData.type) {
-      case STAGES.LOADING:
-        toast.loading(toastData.message.message);
-        break;
-
-      case STAGES.SUCCESS:
-        toast.success(toastData.message.message);
-        break;
-
-      case STAGES.FAILURE:
-        toast.error(toastData.message.message);
-        break;
-
-      case STAGES.PROMISE:
-        toast.promise(toastData.message.request, toastData.message.info);
-        break;
-
-      default:
-    }
+    handleToast(toastData);
   }, [toastData]);
 
   return (
-    <div className="flex flex-col px-20 ">
+    <div className="flex flex-col px-20 w-full">
       <ToastContainer
         position="bottom-right"
         autoClose={1000}
@@ -89,9 +73,57 @@ export default function Hero({}: Props) {
           Clear
         </Button>
       </div>
+      <div className="flex flex-col gap-6 mt-10">
 
-      <ProductDetail details={details} />
+        <ProductDetail details={details} />
+        <HeroProducts />
+      </div>
       {/* <ModalComponent title="This is test" message="New message" /> */}
     </div>
   );
+}
+
+function HeroProducts() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log("hi ther");
+
+    //@ts-ignore
+    dispatch(getheroProducts());
+  }, []);
+  const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
+  console.log("dd", heroproducts.length);
+  console.log("dd", heroproducts);
+
+  return (
+    <div className="w-full flex gap-4 flex-wrap">
+      {heroproducts.length > 0 &&
+        heroproducts.map((prod: any, i: number) => {
+          return <ProductCard key={i} {...prod} />;
+        })}
+    </div>
+  );
+}
+
+function handleToast(toastData: any) {
+  switch (toastData.type) {
+    case STAGES.LOADING:
+      toast.loading(toastData.message.message);
+      break;
+
+    case STAGES.SUCCESS:
+      toast.success(toastData.message.message);
+      break;
+
+    case STAGES.FAILURE:
+      toast.error(toastData.message.message);
+      break;
+
+    case STAGES.PROMISE:
+      toast.promise(toastData.message.request, toastData.message.info);
+      break;
+
+    default:
+  }
 }

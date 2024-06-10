@@ -12,49 +12,36 @@ async function getUser() {
 
 
 async function GET(req: any, res: NextApiResponse) {
-  const session = await getUser();
-
-  if (!session) {
-    return NextResponse.json(
-      { response: "Invalid" },
-      {
-        status: 200,
-      }
-    );
-  }
-
-  const email = session.user?.email;
-
-  if (!email) {
-    return NextResponse.json(
-      { response: "not found" },
-      {
-        status: 200,
-      }
-    );
-  }
-
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-      include: {
-        products: true,
-      },
-    });
+    const session = await getUser();
 
-    if (!user) {
+    if (!session) {
       return NextResponse.json(
-        { response: "no user" },
+        { response: "Invalid" },
         {
           status: 200,
         }
       );
     }
 
+    const email = session.user?.email;
+
+    if (!email) {
+      return NextResponse.json(
+        { response: "not found" },
+        {
+          status: 200,
+        }
+      );
+    }
+    const products = await prisma.product.findMany({
+      take:10
+    });
+
+    
+
     return NextResponse.json(
-      { response: user.products },
+      { response: products },
       {
         status: 200,
       }

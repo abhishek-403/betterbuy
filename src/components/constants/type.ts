@@ -11,6 +11,8 @@ export type ProductDetailsProp = {
   pricedata?: PricePointProps[];
   createdAt?: Date;
   updatedAt?: Date;
+  alltimehighprice?: number;
+  alltimelowprice?: number;
 };
 export type PricePointProps = {
   id:number,

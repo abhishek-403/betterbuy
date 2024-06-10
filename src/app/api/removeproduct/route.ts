@@ -3,13 +3,13 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
+import prisma from "@/lib/prisma";
 
 async function getUser() {
   const session = await getServerSession(NEXT_AUTH_CONFIG);
   return session;
 }
 
-const prisma = new PrismaClient();
 
 async function POST(req: any, res: NextApiResponse) {
   try {
