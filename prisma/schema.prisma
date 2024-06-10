@@ -24,8 +24,8 @@ model Product {
   image            String
   provider         String?
   url              String
-  alltimelowprice  Float?
-  alltimehighprice Float?
+  alltimelowprice  Float
+  alltimehighprice Float
   pricedata        Pricecheckpoints[]
   owner            User               @relation(fields: [ownerId], references: [email], onDelete: Cascade)
   ownerId          String

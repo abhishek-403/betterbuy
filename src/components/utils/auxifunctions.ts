@@ -11,3 +11,14 @@ export function formatDateTime(date: Date) {
 
   return date.toLocaleString("en-IN", options);
 }
+
+export function formatPrice(number: number): string {
+  const numberString = number.toString();
+
+  const parts = [];
+  for (let i = numberString.length; i > 0; i -= 3) {
+    parts.unshift(numberString.substring(Math.max(0, i - 3), i));
+  }
+
+  return parts.join(",");
+}

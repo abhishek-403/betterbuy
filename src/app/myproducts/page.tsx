@@ -1,17 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ProductDetailsProp } from "../../components/constants/type";
+import { ProductCardProps, ProductDetailsProp, TITLE_LENGTH } from "../../components/utils/type";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Appbar } from "@/components/AppBar";
 import Link from "next/link";
+import { formatPrice } from "@/components/utils/auxifunctions";
 type Props = {};
 
-interface ProductCardProps extends ProductDetailsProp {
-  fetchProducts?: () => void;
-  id: number;
-}
-const TITLE_LENGTH = 65;
+
 
 export default function MyProducts({}: Props) {
   const [productList, setProductList] = useState<ProductDetailsProp[]>([]);
@@ -100,7 +97,7 @@ export function ProductCard({
             <div>Current price :</div>
             <div className="flex gap-1">
               <div>{currency}</div>
-              <div className="">{price}</div>
+              <div className="">{formatPrice(price)}</div>
             </div>
           </Button>
           <Button
@@ -111,7 +108,9 @@ export function ProductCard({
             <div className="flex gap-1">
               <div>{currency}</div>
               <div className="">
-                {alltimelowprice === null ? price : alltimelowprice}
+                {alltimelowprice === null
+                  ? formatPrice(price)
+                  : formatPrice(alltimelowprice!)}
               </div>
             </div>
           </Button>
@@ -123,7 +122,9 @@ export function ProductCard({
             <div className="flex gap-1">
               <div>{currency}</div>
               <div className="">
-                {alltimehighprice === null ? price : alltimehighprice}
+                {alltimehighprice === null
+                  ? formatPrice(price)
+                  : formatPrice(alltimehighprice!)}
               </div>
             </div>
           </Button>
@@ -135,9 +136,10 @@ export function ProductCard({
         </Link>
         {/* <Button variant={"default"}>More info</Button> */}
         <Button variant={"destructive"} onClick={removeProduct}>
-          Remove{" "}
+          Remove
         </Button>
       </div>
     </div>
   );
 }
+

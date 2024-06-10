@@ -2,14 +2,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "../ui/button";
-import { ProductDetailsProp, STAGES } from "../constants/type";
+import {
+  ProductCardProps,
+  ProductDetailsProp,
+  STAGES,
+  TITLE_LENGTH,
+} from "../utils/type";
 import ProductDetail from "./ProductDetail";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { ModalComponent } from "../Modal";
-import { getheroProducts } from "../redux/slices/appConfiigSlice";
+import { getheroProducts, showToast } from "../redux/slices/appConfiigSlice";
 import { ProductCard } from "@/app/myproducts/page";
+import { formatPrice } from "../utils/auxifunctions";
+import Link from "next/link";
 type Props = {};
 
 export default function Hero({}: Props) {
@@ -24,6 +31,9 @@ export default function Hero({}: Props) {
     image: "",
     url: "",
     id: 0,
+    provider: "",
+    alltimehighprice: 0,
+    alltimelowprice: 0,
   });
   const [url, setUrl] = useState("");
 
@@ -73,8 +83,15 @@ export default function Hero({}: Props) {
           Clear
         </Button>
       </div>
+      <Button
+        onClick={async () => {
+          const a = await axios.get("/api/updateproduct");
+          console.log(a.data);
+        }}
+      >
+        update
+      </Button>
       <div className="flex flex-col gap-6 mt-10">
-
         <ProductDetail details={details} />
         <HeroProducts />
       </div>
@@ -87,21 +104,143 @@ function HeroProducts() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("hi ther");
-
     //@ts-ignore
     dispatch(getheroProducts());
   }, []);
   const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
-  console.log("dd", heroproducts.length);
-  console.log("dd", heroproducts);
 
   return (
     <div className="w-full flex gap-4 flex-wrap">
       {heroproducts.length > 0 &&
         heroproducts.map((prod: any, i: number) => {
-          return <ProductCard key={i} {...prod} />;
+          return <HeroProductCard key={i} {...prod} />;
         })}
+    </div>
+  );
+}
+
+export function HeroProductCard({
+  name,
+  price,
+  image,
+  currency,
+  url,
+  id,
+  alltimelowprice,
+  alltimehighprice,
+  provider,
+  fetchProducts,
+}: ProductCardProps) {
+  const dispatch = useDispatch();
+
+  // async function removeProduct() {
+  //   try {
+  //     const res = await axios.post("/api/removeproduct", { id });
+  //     console.log(res.data);
+  //     if (!fetchProducts) return;
+  //     fetchProducts();
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+  async function handleTrack() {
+    let request = axios.post("/api/addproduct", {
+      name,
+      price,
+      currency,
+      image,
+      provider,
+      url,
+    });
+
+    //@ts-ignore
+    dispatch(getheroProducts());
+    dispatch(
+      showToast({
+        type: STAGES.PROMISE,
+        message: {
+          info: {
+            pending: "Adding Product",
+            success: "Product added 👌",
+            error: "Error occured 🤯",
+          },
+          request,
+        },
+      })
+    );
+  }
+  return (
+    <div className="flex flex-col w-[400px] items-center gap-8 border-2 p-4">
+      <div className="flex flex-col gap-4 items-center">
+        <div className="bg-zinc-100 rounded-lg">
+          <img
+            src={image}
+            alt=""
+            className="w-[300px] aspect-square object-contain mix-blend-multiply"
+          />
+        </div>
+        <div className="text-xl font-base">
+          {name.length >= TITLE_LENGTH ? (
+            <p>{name.substring(0, TITLE_LENGTH)}...</p>
+          ) : (
+            name
+          )}
+        </div>
+      </div>
+      <div className="w-full mt-auto px-2 flex flex-col gap-6 ">
+        <div className="flex flex-col  gap-2">
+          <Button
+            variant={"secondary"}
+            className="flex gap-2 py-6  font-bold text-xl"
+          >
+            <div>Current price :</div>
+            <div className="flex gap-1">
+              <div>{currency}</div>
+              <div className="">{formatPrice(price)}</div>
+            </div>
+          </Button>
+          <Button
+            variant={"outline"}
+            className="flex gap-2 py-6  font-bold text-xl"
+          >
+            <div>Lowest price :</div>
+            <div className="flex gap-1">
+              <div>{currency}</div>
+              <div className="">
+                {alltimelowprice === null
+                  ? formatPrice(price)
+                  : formatPrice(alltimelowprice!)}
+              </div>
+            </div>
+          </Button>
+          <Button
+            variant={"outline"}
+            className="flex gap-2 py-6  font-bold text-xl"
+          >
+            <div>Highest price :</div>
+            <div className="flex gap-1">
+              <div>{currency}</div>
+              <div className="">
+                {alltimehighprice === null
+                  ? formatPrice(price)
+                  : formatPrice(alltimehighprice!)}
+              </div>
+            </div>
+          </Button>
+        </div>
+      </div>
+      <div className="w-full justify-between flex mt-4 gap-2  ">
+        <Link href={url} target="_blank" className="flex-1">
+          <Button variant={"quarterny"}>Buy now</Button>
+        </Link>
+        {/* <Button variant={"default"}>More info</Button> */}
+        {/* <Button variant={"destructive"} onClick={removeProduct}>
+          Remove{" "}
+        </Button> */}
+        <Button variant={"destructive"} onClick={handleTrack}>
+          Track
+        </Button>
+      </div>
     </div>
   );
 }

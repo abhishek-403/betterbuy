@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { ProductDetailsProp } from "@/components/constants/type";
+import { ProductDetailsProp } from "@/components/utils/type";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
@@ -7,23 +7,21 @@ type ResponseData = {
   message: string;
 };
 
-export const HOSTS : { [key: string]: string } = {
+export const HOSTS: { [key: string]: string } = {
   Flipkart: "flipkart",
   Amazon: "amazon",
-  Invalid:"invalid",
-  NA:"na",
+  Invalid: "invalid",
+  NA: "na",
 };
-
 
 async function POST(req: Request, res: Response) {
   try {
     let { url } = await req.json();
 
     const host = getHost(url);
-    
+
     let prodDetails;
     if (host === HOSTS.Amazon) {
-      
       prodDetails = await getAmazon(url);
     } else if (host === HOSTS.flipkart) {
       prodDetails = await getFlipkart(url);
@@ -146,7 +144,7 @@ async function getFlipkart(url: string) {
   return itemFinal;
 }
 
-function getHost(url: string) {
+export function getHost(url: string) {
   try {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;

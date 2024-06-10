@@ -1,12 +1,11 @@
 import React from "react";
-import { ProductDetailsProp, STAGES } from "../constants/type";
-import Image from "next/image";
-import image from "@/components/assets/testimg.jpg";
+import { ProductDetailsProp, STAGES } from "../utils/type";
 import { Button } from "../ui/button";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { showToast } from "../redux/slices/appConfiigSlice";
 import axios from "axios";
+import { formatPrice } from "../utils/auxifunctions";
 type Props = {
   details: ProductDetailsProp;
 };
@@ -16,14 +15,13 @@ export default function ProductDetail({ details }: Props) {
 
   async function handleTrack() {
     let request = axios.post("/api/addproduct", {
-        name: details.name,
-        price: details.price,
-        currency: details.currency,
-        image: details.image,
-        provider:details.provider,
-        url:details.url,
-      });
-   
+      name: details.name,
+      price: details.price,
+      currency: details.currency,
+      image: details.image,
+      provider: details.provider,
+      url: details.url,
+    });
 
     dispatch(
       showToast({
@@ -41,7 +39,7 @@ export default function ProductDetail({ details }: Props) {
   }
   if (!details.name) {
     // return <div className="flex  m-10 items-center justify-center">No details</div>;
-    return
+    return;
   }
   return (
     <div className="flex gap-2 ">
@@ -54,7 +52,7 @@ export default function ProductDetail({ details }: Props) {
         <div className="text-xl font-bold max-w-[500px] ">{details.name}</div>
         <div className="flex">
           <div className="text-xl font-bold">{details.currency}</div>
-          <div className="text-xl font-bold">{details.price}</div>
+          <div className="text-xl font-bold">{formatPrice(details.price)}</div>
         </div>
         <Button
           onClick={handleTrack}

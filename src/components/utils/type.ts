@@ -1,5 +1,9 @@
 import { StaticImageData } from "next/image";
 
+export interface ProductCardProps extends ProductDetailsProp {
+  fetchProducts?: () => void;
+  id: number;
+}
 export type ProductDetailsProp = {
   name: string;
   price: number;
@@ -7,12 +11,12 @@ export type ProductDetailsProp = {
   image: string;
   url: string;
   id: number;
-  provider?: string;
+  provider: string;
   pricedata?: PricePointProps[];
   createdAt?: Date;
   updatedAt?: Date;
-  alltimehighprice?: number;
-  alltimelowprice?: number;
+  alltimehighprice: number;
+  alltimelowprice: number;
 };
 export type PricePointProps = {
   id:number,
@@ -26,3 +30,6 @@ export enum STAGES {
   FAILURE,
   PROMISE,
 }
+
+
+export const TITLE_LENGTH = 65;
