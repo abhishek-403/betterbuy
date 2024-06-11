@@ -4,12 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 import prisma from "@/lib/prisma";
-
-async function getUser() {
-  const session = await getServerSession(NEXT_AUTH_CONFIG);
-  return session;
-}
-
+import { getUser } from "@/components/utils/auxifunctions";
 
 async function POST(req: any, res: NextApiResponse) {
   try {
@@ -36,24 +31,49 @@ async function POST(req: any, res: NextApiResponse) {
       );
     }
 
-
-    await prisma.pricecheckpoints.deleteMany({
+    const product = await prisma.product.findUnique({
       where: { id },
+      include: { owner: true, pricedata: true },
     });
 
-    const user = await prisma.product.delete({
-      where: {
-        id,
-      },
-    });
+    if (!product) {
+      console.log("Product not found.");
+      return NextResponse.json({ response: "not owner" }, { status: 200 });
+    }
 
-    if (!user) {
-      return NextResponse.json(
-        { response: "no user" },
-        {
-          status: 200,
-        }
-      );
+    // Check if the user is the owner of the product
+    const isOwner = product.owner.some((user) => user.email === email);
+
+    if (!isOwner) {
+      console.log("You are not the owner of this product.");
+      return;
+    }
+
+    if (product.owner.length === 1) {
+      await prisma.pricecheckpoints.deleteMany({
+        where: {
+          productId: id,
+        },
+      });
+
+      // Now, delete the product
+      await prisma.product.delete({
+        where: {
+          id,
+        },
+      });
+
+     
+    } else {
+      await prisma.user.update({
+        where: { email },
+        data: {
+          products: {
+            disconnect: { id: id },
+          },
+        },
+      });
+
     }
 
     return NextResponse.json(

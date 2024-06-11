@@ -26,7 +26,7 @@ model Product {
   url              String
   alltimelowprice  Float
   alltimehighprice Float
-  pricedata        Pricecheckpoints[]
+  pricedata        Pricecheckpoints[]  
   owner            User[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt

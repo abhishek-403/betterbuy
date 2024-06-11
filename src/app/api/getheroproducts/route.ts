@@ -4,14 +4,11 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 import prisma from "@/lib/prisma";
-
-async function getUser() {
-  const session = await getServerSession(NEXT_AUTH_CONFIG);
-  return session;
-}
+import { getUser } from "@/components/utils/auxifunctions";
 
 
-async function GET(req: any, res: NextApiResponse) {
+
+async function GET() {
   try {
     const session = await getUser();
 
@@ -34,17 +31,33 @@ async function GET(req: any, res: NextApiResponse) {
         }
       );
     }
-    const products = await prisma.product.findMany({
-      where:{
-        
-      },
-      take:10
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { products: true },
     });
 
-    
+    if (!user) {
+      console.log("User not found.");
+      return NextResponse.json(
+        { response: "not found" },
+        {
+          status: 200,
+        }
+      );
+    }
+
+    // Get all products owned by other users
+    const productsOwnedByOthers = await prisma.product.findMany({
+      where: {
+        NOT: {
+          owner: { some: { email } },
+        },
+      },
+      take: 10,
+    });
 
     return NextResponse.json(
-      { response: products },
+      { response: productsOwnedByOthers },
       {
         status: 200,
       }

@@ -146,23 +146,21 @@ export function HeroProductCard({
   //   }
   // }
   async function handleTrack() {
-    let request = axios.post("/api/addproduct", {
-      name,
-      price,
-      currency,
-      image,
-      provider,
-      url,
-    });
+    let request = axios
+      .post("/api/updateproductowner", {
+        id,
+      })
+      .then(() => {
+        //@ts-ignore
+        dispatch(getheroProducts());
+      });
 
-    //@ts-ignore
-    dispatch(getheroProducts());
     dispatch(
       showToast({
         type: STAGES.PROMISE,
         message: {
           info: {
-            pending: "Adding Product",
+            pending: "Tracking Product",
             success: "Product added 👌",
             error: "Error occured 🤯",
           },

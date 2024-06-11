@@ -3,17 +3,16 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
-import { formatDateTime } from "@/components/utils/auxifunctions";
+import { formatDateTime, getUser } from "@/components/utils/auxifunctions";
 import prisma from "@/lib/prisma";
+import axios from "axios";
 
-async function getUser() {
-  const session = await getServerSession(NEXT_AUTH_CONFIG);
-  return session;
-}
+const NEXT_CLIENT_URL = "http://localhost:3000";
 
 async function POST(req: any, res: NextApiResponse) {
   try {
-    const { name, price, currency, image, url, provider,id } = await req.json();
+    const { name, price, currency, image, url, provider, id } =
+      await req.json();
 
     const session = await getUser();
 
@@ -36,7 +35,25 @@ async function POST(req: any, res: NextApiResponse) {
     }
 
     console.log(id);
-    
+    const existingProd = await prisma.product.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (existingProd) {
+      console.log("existing", session?.user.email);
+
+      const res = await axios.post(
+        `${NEXT_CLIENT_URL}/api/updateproductowner`,
+        { id, userEmail: session?.user.email }
+      );
+      return NextResponse.json(
+        {
+          response: res.data,
+        },
+        { status: 200 }
+      );
+    }
     const newProduct = await prisma.product.create({
       data: {
         id,
@@ -46,8 +63,8 @@ async function POST(req: any, res: NextApiResponse) {
         image,
         url,
         provider,
-        alltimehighprice:price,
-        alltimelowprice:price,
+        alltimehighprice: price,
+        alltimelowprice: price,
         owner: {
           connect: { email },
         },
