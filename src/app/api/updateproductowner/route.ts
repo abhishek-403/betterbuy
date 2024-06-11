@@ -10,7 +10,6 @@ async function POST(req: Request, res: NextApiResponse) {
     const { id, userEmail } = await req.json();
     const session = await getUser();
 
-    console.log("exiesting22", id, session?.user.email);
 
     if (!session && !userEmail) {
       return NextResponse.json(

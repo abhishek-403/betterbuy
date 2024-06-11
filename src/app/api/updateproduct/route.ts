@@ -8,7 +8,7 @@ import { generateEmail } from "@/components/utils/mailer";
 
 async function GET(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const products = await prisma.product.findMany({ take: 3 });
+    const products = await prisma.product.findMany({ take: 4 });
 
     if (!products) {
       return NextResponse.json(
@@ -20,7 +20,6 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
     }
     for (const product of products) {
       //fetching new prices
-      const prevprice = product.price;
       const newprice = await getPrice(product.url);
       // const receiverEmail = product.ownerId;
 
@@ -28,7 +27,7 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
 
       //updating products table
 
-      if (newprice >= product.alltimehighprice) {
+      if (newprice > product.alltimehighprice) {
         await prisma.product.update({
           where: {
             id: product.id,
@@ -38,8 +37,19 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
             alltimehighprice: newprice,
           },
         });
-      } else if (newprice <= product.alltimelowprice) {
-        await prisma.product.update({
+        await prisma.pricecheckpoints.create({
+          data: {
+            //@ts-ignore
+            price: newprice,
+            currency: product.currency,
+            date: formatDateTime(new Date()),
+            product: {
+              connect: { id: product.id },
+            },
+          },
+        });
+      } else if (newprice < product.alltimelowprice) {
+        const products = await prisma.product.update({
           where: {
             id: product.id,
           },
@@ -47,34 +57,39 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
             price: newprice,
             alltimelowprice: newprice,
           },
+          include: {
+            owner: true,
+          },
         });
 
+        await prisma.pricecheckpoints.create({
+          data: {
+            //@ts-ignore
+            price: newprice,
+            currency: product.currency,
+            date: formatDateTime(new Date()),
+            product: {
+              connect: { id: product.id },
+            },
+          },
+        });
         // send email
 
-        const formatted = formatPrice(newprice);
+        let owners = products.owner;
+        console.log("owners", owners);
 
-        generateEmail({
-          receiverEmail:"",
-          img: product.image,
-          link: product.url,
-          title: product.name,
-          price: `${product.currency}${formatted}`,
-        });
+        for (const owner of owners) {
+          const formatted = formatPrice(newprice);
+          generateEmail({
+            receiverEmail: owner.email,
+            img: product.image,
+            link: product.url,
+            title: product.name,
+            price: `${product.currency}${formatted}`,
+          });
+        }
       }
 
-      //creating new checkpoint
-
-      await prisma.pricecheckpoints.create({
-        data: {
-          //@ts-ignore
-          price: newprice,
-          currency: product.currency,
-          date: formatDateTime(new Date()),
-          product: {
-            connect: { id: product.id },
-          },
-        },
-      });
     }
 
     return NextResponse.json(
@@ -102,7 +117,7 @@ async function getPrice(url: string): Promise<number> {
     let prodDetails;
     if (host === HOSTS.Amazon) {
       prodDetails = await getAmazon(url);
-    } else if (host === HOSTS.flipkart) {
+    } else if (host === HOSTS.Flipkart) {
       prodDetails = await getFlipkart(url);
     }
     if (!prodDetails) return 0;
