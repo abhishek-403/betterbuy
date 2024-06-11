@@ -13,7 +13,7 @@ async function getUser() {
 
 async function POST(req: any, res: NextApiResponse) {
   try {
-    const { name, price, currency, image, url, provider } = await req.json();
+    const { name, price, currency, image, url, provider,id } = await req.json();
 
     const session = await getUser();
 
@@ -35,8 +35,11 @@ async function POST(req: any, res: NextApiResponse) {
       return NextResponse.json({ response: "not found" }, { status: 200 });
     }
 
+    console.log(id);
+    
     const newProduct = await prisma.product.create({
       data: {
+        id,
         name,
         price,
         currency,

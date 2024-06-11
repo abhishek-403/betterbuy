@@ -16,22 +16,33 @@ export const HOSTS: { [key: string]: string } = {
 
 async function POST(req: Request, res: Response) {
   try {
-    let { url } = await req.json();
-
+    const { url } = await req.json();
     const host = getHost(url);
 
+    const parsedUrl = new URLSearchParams(new URL(url).search);
+
     let prodDetails;
+    let productId;
+
     if (host === HOSTS.Amazon) {
       prodDetails = await getAmazon(url);
-    } else if (host === HOSTS.flipkart) {
+      const match = url.match(/\/dp\/([A-Z0-9]+)/);
+      productId = match ? match[1] : null;
+
+    } else if (host === HOSTS.Flipkart) {
+      productId = parsedUrl.get("pid");
       prodDetails = await getFlipkart(url);
+
+      
+
+
     } else if (host === HOSTS.NA) {
       prodDetails = { message: "Service form this host not available" };
     } else if (host === HOSTS.Invalid) {
       prodDetails = { message: "Invalid url" };
     }
     return NextResponse.json(
-      { response: prodDetails },
+      { response: { ...prodDetails, id:productId } },
       {
         status: 200,
       }
@@ -152,7 +163,7 @@ export function getHost(url: string) {
     if (hostname.includes("amazon")) {
       return HOSTS.Amazon;
     } else if (hostname.includes("flipkart")) {
-      return HOSTS.flipkart;
+      return HOSTS.Flipkart;
     } else {
       return HOSTS.NA;
     }

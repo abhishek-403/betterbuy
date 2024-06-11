@@ -2,7 +2,6 @@ import { StaticImageData } from "next/image";
 
 export interface ProductCardProps extends ProductDetailsProp {
   fetchProducts?: () => void;
-  id: number;
 }
 export type ProductDetailsProp = {
   name: string;
@@ -10,7 +9,7 @@ export type ProductDetailsProp = {
   currency: string;
   image: string;
   url: string;
-  id: number;
+  id: string;
   provider: string;
   pricedata?: PricePointProps[];
   createdAt?: Date;

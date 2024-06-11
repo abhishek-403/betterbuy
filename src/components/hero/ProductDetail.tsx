@@ -14,6 +14,8 @@ export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
 
   async function handleTrack() {
+    console.log(details);
+    
     let request = axios.post("/api/addproduct", {
       name: details.name,
       price: details.price,
@@ -21,6 +23,7 @@ export default function ProductDetail({ details }: Props) {
       image: details.image,
       provider: details.provider,
       url: details.url,
+      id:details.id
     });
 
     dispatch(

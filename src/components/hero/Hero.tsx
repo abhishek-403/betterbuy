@@ -30,7 +30,7 @@ export default function Hero({}: Props) {
     price: 0,
     image: "",
     url: "",
-    id: 0,
+    id: "",
     provider: "",
     alltimehighprice: 0,
     alltimelowprice: 0,
@@ -43,8 +43,10 @@ export default function Hero({}: Props) {
       let response = await axios.post("/api/scrape", {
         url,
       });
-      console.log(response.data.response);
+      // if (!response.data.response.id) return;
       setDetails({ ...response.data.response, url });
+      console.log(response.data.response);
+      console.log(details);
     } catch (e) {
       console.log(e);
     }
@@ -111,7 +113,8 @@ function HeroProducts() {
 
   return (
     <div className="w-full flex gap-4 flex-wrap">
-      {heroproducts.length > 0 && heroproducts.map((prod: any, i: number) => {
+      {heroproducts.length > 0 &&
+        heroproducts.map((prod: any, i: number) => {
           return <HeroProductCard key={i} {...prod} />;
         })}
     </div>

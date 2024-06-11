@@ -13,11 +13,11 @@ model Pricecheckpoints {
   currency  String
   date      String
   product   Product @relation(fields: [productId], references: [id])
-  productId Int
+  productId String
 }
 
 model Product {
-  id               Int                @id @default(autoincrement())
+  id               String             @id
   name             String
   price            Float
   currency         String
@@ -27,8 +27,7 @@ model Product {
   alltimelowprice  Float
   alltimehighprice Float
   pricedata        Pricecheckpoints[]
-  owner            User               @relation(fields: [ownerId], references: [email], onDelete: Cascade)
-  ownerId          String
+  owner            User[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 }

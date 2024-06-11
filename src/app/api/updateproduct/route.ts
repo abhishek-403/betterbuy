@@ -22,7 +22,7 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
       //fetching new prices
       const prevprice = product.price;
       const newprice = await getPrice(product.url);
-      const receiverEmail = product.ownerId;
+      // const receiverEmail = product.ownerId;
 
       if (!newprice) return NextResponse.json("erro");
 
@@ -54,7 +54,7 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
         const formatted = formatPrice(newprice);
 
         generateEmail({
-          receiverEmail,
+          receiverEmail:"",
           img: product.image,
           link: product.url,
           title: product.name,
