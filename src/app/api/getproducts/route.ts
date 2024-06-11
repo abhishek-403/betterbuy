@@ -1,37 +1,25 @@
-import { NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
+import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 
 async function getUser() {
   const session = await getServerSession(NEXT_AUTH_CONFIG);
   return session;
 }
 
-
-async function GET(req: any, res: NextApiResponse) {
+async function GET() {
   const session = await getUser();
 
   if (!session) {
-    return NextResponse.json(
-      { response: "Invalid" },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(401, "Invalid"));
   }
 
   const email = session.user?.email;
 
   if (!email) {
-    return NextResponse.json(
-      { response: "not found" },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(401, "Not email"));
   }
 
   try {
@@ -45,29 +33,15 @@ async function GET(req: any, res: NextApiResponse) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { response: "no user" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(404, "No user"));
     }
 
-    return NextResponse.json(
-      { response: user.products },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(successres(200, user.products));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 export { GET };
+

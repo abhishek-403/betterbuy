@@ -1,11 +1,7 @@
 //@ts-nocheck
-import { ProductDetailsProp } from "@/components/utils/type";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-
-type ResponseData = {
-  message: string;
-};
 
 export const HOSTS: { [key: string]: string } = {
   Flipkart: "flipkart",
@@ -16,7 +12,7 @@ export const HOSTS: { [key: string]: string } = {
 
 async function POST(req: Request, res: Response) {
   try {
-    const { url }:string = await req.json();
+    const { url }: string = await req.json();
     const host = getHost(url);
 
     const parsedUrl = new URLSearchParams(new URL(url).search);
@@ -28,32 +24,19 @@ async function POST(req: Request, res: Response) {
       prodDetails = await getAmazon(url);
       const match = url.match(/\/dp\/([A-Z0-9]+)/);
       productId = match ? match[1] : null;
-
     } else if (host === HOSTS.Flipkart) {
       productId = parsedUrl.get("pid");
       prodDetails = await getFlipkart(url);
-
-      
-
-
     } else if (host === HOSTS.NA) {
       prodDetails = { message: "Service form this host not available" };
     } else if (host === HOSTS.Invalid) {
       prodDetails = { message: "Invalid url" };
     }
-    return NextResponse.json(
-      { response: { ...prodDetails, id:productId } },
-      {
-        status: 200,
-      }
+
+    return NextResponse.json(successres(200, { ...prodDetails, id: productId })
     );
   } catch (e) {
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 

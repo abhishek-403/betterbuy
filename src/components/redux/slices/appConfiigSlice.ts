@@ -1,20 +1,6 @@
 //@ts-nocheck
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import {  createSlice } from "@reduxjs/toolkit";
 
-export const getheroProducts = createAsyncThunk("/heroproducts", async () => {
-  try {
-
-    const response = await axios.get("/api/getheroproducts");
-
-    return response.data;
-  } catch (e) {
-    console.log(e);
-
-    return Promise.reject(e);
-  } finally {
-  }
-});
 
 const appConfigSlice = createSlice({
   name: "appConfig",
@@ -31,11 +17,7 @@ const appConfigSlice = createSlice({
       state.toastData = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder.addCase(getheroProducts.fulfilled, (state, action) => {
-      state.heroProducts = action.payload.response;
-    });
-  },
+ 
 });
 
 export default appConfigSlice.reducer;

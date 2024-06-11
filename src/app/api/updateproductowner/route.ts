@@ -1,23 +1,16 @@
+import { getUser } from "@/components/utils/auxifunctions";
+import { errorres, successres } from "@/components/utils/responseWrapper";
+import prisma from "@/lib/prisma";
 import { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
-import prisma from "@/lib/prisma";
-import { getUser } from "@/components/utils/auxifunctions";
 
 async function POST(req: Request, res: NextApiResponse) {
   try {
     const { id, userEmail } = await req.json();
     const session = await getUser();
 
-
     if (!session && !userEmail) {
-      return NextResponse.json(
-        { response: "Invalid" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "Invalid"));
     }
     let email;
     if (session) {
@@ -27,12 +20,7 @@ async function POST(req: Request, res: NextApiResponse) {
     }
 
     if (!email) {
-      return NextResponse.json(
-        { response: "not found" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "No email"));
     }
     const user = await prisma.user.findUnique({
       where: { email },
@@ -43,10 +31,7 @@ async function POST(req: Request, res: NextApiResponse) {
     });
 
     if (!user || !product) {
-      return NextResponse.json(
-        { response: "User or product not found." },
-        { status: 404 }
-      );
+      return NextResponse.json(errorres(401, "User or product not found"));
     }
 
     const isAlreadyOwner = await prisma.product.findFirst({
@@ -55,7 +40,7 @@ async function POST(req: Request, res: NextApiResponse) {
       },
     });
     if (isAlreadyOwner) {
-      return NextResponse.json({ response: "Already added" }, { status: 200 });
+      return NextResponse.json(successres(200, "Already added"));
     }
 
     await prisma.product.update({
@@ -76,21 +61,12 @@ async function POST(req: Request, res: NextApiResponse) {
       },
     });
 
-    return NextResponse.json(
-      { response: "added" },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(successres(200, "Added"));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server error"));
   }
 }
 export { POST };
+

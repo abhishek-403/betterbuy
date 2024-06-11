@@ -1,30 +1,24 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import { setLoader, showToast } from "../redux/slices/appConfiigSlice";
 import { Button } from "../ui/button";
+import { formatPrice } from "../utils/auxifunctions";
 import {
   ProductCardProps,
   ProductDetailsProp,
   STAGES,
   TITLE_LENGTH,
 } from "../utils/type";
-import ProductDetail from "./ProductDetail";
-import toast, { Toaster } from "react-hot-toast";
-import "react-toastify/dist/ReactToastify.css";
-import { useDispatch, useSelector } from "react-redux";
-import { ModalComponent } from "../Modal";
-import { getheroProducts, showToast } from "../redux/slices/appConfiigSlice";
-import { ProductCard } from "@/app/myproducts/page";
-import { formatPrice } from "../utils/auxifunctions";
-import Link from "next/link";
 type Props = {};
 
 export default function Hero({}: Props) {
-  const toastData = useSelector(
-    (state: any) => state.appConfigReducer.toastData
-  );
-
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
+
+  const [url, setUrl] = useState("");
   const [details, setDetails] = useState<ProductDetailsProp>({
     name: "",
     currency: "",
@@ -36,31 +30,27 @@ export default function Hero({}: Props) {
     alltimehighprice: 0,
     alltimelowprice: 0,
   });
-  const [url, setUrl] = useState("");
 
+  const dispatch = useDispatch();
   async function handleSearch() {
     try {
       setIsSearchLoading(true);
+      dispatch(setLoader(true));
       if (!url) return;
       const response = await axios.post("/api/scrape", {
         url,
       });
-      setDetails({ ...response.data.response, url });
+
+      setDetails({ ...response.data.result, url });
+      dispatch(setLoader(false));
     } catch (e) {
     } finally {
       setIsSearchLoading(false);
     }
   }
 
-  useEffect(() => {
-    handleToast(toastData);
-  }, [toastData]);
-
   return (
     <div className="flex flex-col px-20 w-full">
-      <Toaster
-       
-      />
       <div className=" flex gap-4 items-center ">
         <input
           className="w-full  h-12 px-4 p-2 rounded-xl border-2 border-[#ffffff22] focus:outline outline-[#414141]"
@@ -93,7 +83,7 @@ export default function Hero({}: Props) {
         update
       </Button> */}
       <div className="flex flex-col gap-6 mt-10">
-        <ProductDetail details={details} />
+        <ProductDetail isSearchLoading={isSearchLoading} details={details} />
         <HeroProducts />
       </div>
     </div>
@@ -101,13 +91,31 @@ export default function Hero({}: Props) {
 }
 
 function HeroProducts() {
-  const dispatch = useDispatch();
-  const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
+  // const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
+  const [isHeroLoading, setIsHeroLoading] = useState<boolean>(false);
+  const [heroproducts, setHeroproducts] = useState<[]>([]);
 
   useEffect(() => {
     //@ts-ignore
-    dispatch(getheroProducts());
+    getheroProducts();
   }, []);
+  async function getheroProducts() {
+    try {
+      setIsHeroLoading(true);
+      const response = await axios.get("/api/getheroproducts");
+      setHeroproducts(response.data.result);
+    } catch (e) {
+    } finally {
+      setIsHeroLoading(false);
+    }
+  }
+  if (isHeroLoading) {
+    return (
+      <div className="w-full mt-20 -full flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">
@@ -119,6 +127,89 @@ function HeroProducts() {
             return <HeroProductCard key={i} {...prod} />;
           })}
       </div>
+    </div>
+  );
+}
+type ProductProps = {
+  details: ProductDetailsProp;
+  isSearchLoading: boolean;
+};
+
+export function ProductDetail({ details, isSearchLoading }: ProductProps) {
+  const dispatch = useDispatch();
+
+  const [isTrackLoading, setIsTrackLoading] = useState<boolean>(false);
+
+  async function handleTrack() {
+    try {
+      dispatch(setLoader(true));
+      setIsTrackLoading(true);
+      let res = await axios.post("/api/addproduct", {
+        name: details.name,
+        price: details.price,
+        currency: details.currency,
+        image: details.image,
+        provider: details.provider,
+        url: details.url,
+        id: details.id,
+      });
+      dispatch(
+        showToast({
+          type: res.data.status,
+          message: res.data.result,
+        })
+      );
+    } catch (e) {
+    } finally {
+      dispatch(setLoader(false));
+      setIsTrackLoading(false);
+    }
+  }
+
+  if (isSearchLoading) {
+    return (
+      <div className="w-full mt-10 -full flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+  if (!details.name) {
+    return;
+  }
+  return (
+    <div className="flex gap-2 border-2 w-fit mx-auto">
+      <div className="flex bg-zinc-100 rounded-lg m-3 ">
+        {details.image && (
+          <img
+            alt=""
+            className="p-4  w-[300px] aspect-square object-contain mix-blend-multiply"
+            src={details.image}
+          />
+        )}
+      </div>
+      <div className="flex flex-col gap-6 py-2  ">
+        <div className="text-xl font-bold max-w-[500px] ">{details.name}</div>
+        <Button
+          variant={"secondary"}
+          className="flex gap-2 py-6 w-fit  font-bold text-xl"
+        >
+          <div>Current price :</div>
+          <div className="flex gap-1">
+            <div>{details.currency}</div>
+            <div className="">{formatPrice(details.price)}</div>
+          </div>
+        </Button>
+
+        <Button
+          onClick={handleTrack}
+          variant={"destructive"}
+          className=" mt-auto text-xl font-bold w-32 h-12"
+          disabled={isTrackLoading}
+        >
+          Track
+        </Button>
+      </div>
+      <div></div>
     </div>
   );
 }
@@ -137,33 +228,29 @@ export function HeroProductCard({
 
   const [isTrackLoading, setIsTrackLoading] = useState<boolean>(false);
   async function handleTrack() {
-    setIsTrackLoading(true);
-    const request = axios
-      .post("/api/updateproductowner", { id })
-      .then(() => {
-        //@ts-ignore
-        dispatch(getheroProducts());
-      })
-      .finally(() => setIsTrackLoading(false));
+    try {
+      setIsTrackLoading(true);
+      dispatch(setLoader(true));
+      const res = await axios.post("/api/updateproductowner", { id });
 
-    dispatch(
-      showToast({
-        type: STAGES.PROMISE,
-        message: {
-          info: {
-            pending: "Tracking Product",
-            success: "Product added 👌",
-            error: "Error occured 🤯",
-          },
-          request,
-        },
-      })
-    );
+      //@ts-ignore
+      dispatch(getheroProducts());
+      dispatch(
+        showToast({
+          type: res.data.status,
+          message: res.data.result,
+        })
+      );
+    } catch (e) {
+    } finally {
+      dispatch(setLoader(false));
+      setIsTrackLoading(false);
+    }
   }
   return (
     <div className="flex flex-col w-[400px] items-center gap-8 border-2 p-4">
       <div className="flex flex-col gap-6 items-center">
-        <div className="bg-zinc-100 rounded-lg">
+        <div className="bg-zinc-100 rounded-lg w-full  flex items-center justify-center">
           <img
             src={image}
             alt=""
@@ -235,26 +322,4 @@ export function HeroProductCard({
       </div>
     </div>
   );
-}
-
-function handleToast(toastData: any) {
-  switch (toastData.type) {
-    case STAGES.LOADING:
-      toast.loading(toastData.message.message);
-      break;
-
-    case STAGES.SUCCESS:
-      toast.success(toastData.message.message);
-      break;
-
-    case STAGES.FAILURE:
-      toast.error(toastData.message.message);
-      break;
-
-    case STAGES.PROMISE:
-      toast.promise(toastData.message.request, toastData.message.info);
-      break;
-
-    default:
-  }
 }

@@ -1,15 +1,11 @@
-import { NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 import { formatDateTime, getUser } from "@/components/utils/auxifunctions";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 import prisma from "@/lib/prisma";
 import axios from "axios";
-
+import { NextResponse } from "next/server";
 const NEXT_CLIENT_URL = "http://localhost:3000";
 
-async function POST(req: any, res: NextApiResponse) {
+async function POST(req: any, res: Response) {
   try {
     const { name, price, currency, image, url, provider, id } =
       await req.json();
@@ -17,13 +13,13 @@ async function POST(req: any, res: NextApiResponse) {
     const session = await getUser();
 
     if (!session) {
-      return NextResponse.json({ response: "Invalid" }, { status: 200 });
+      return NextResponse.json(errorres(401, "Invalid User"));
     }
 
     const email = session.user?.email;
 
     if (!email) {
-      return NextResponse.json({ response: "not found" }, { status: 200 });
+      return NextResponse.json(errorres(404, "Email not found"));
     }
 
     const user = await prisma.user.findUnique({
@@ -31,7 +27,7 @@ async function POST(req: any, res: NextApiResponse) {
     });
 
     if (!user) {
-      return NextResponse.json({ response: "not found" }, { status: 200 });
+      return NextResponse.json(errorres(404, "User not found"));
     }
 
     const existingProd = await prisma.product.findFirst({
@@ -40,17 +36,11 @@ async function POST(req: any, res: NextApiResponse) {
       },
     });
     if (existingProd) {
-
       const res = await axios.post(
         `${NEXT_CLIENT_URL}/api/updateproductowner`,
         { id, userEmail: session?.user.email }
       );
-      return NextResponse.json(
-        {
-          response: res.data,
-        },
-        { status: 200 }
-      );
+      return NextResponse.json(successres(200, res.data.result));
     }
     const newProduct = await prisma.product.create({
       data: {
@@ -81,11 +71,12 @@ async function POST(req: any, res: NextApiResponse) {
       },
     });
 
-    return NextResponse.json({ response: newProduct }, { status: 200 });
+    return NextResponse.json(successres(200, "Added Product"));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json({ response: e }, { status: 500 });
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 export { POST };
+

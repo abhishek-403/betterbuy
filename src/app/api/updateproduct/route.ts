@@ -5,25 +5,20 @@ import puppeteer from "puppeteer";
 import { HOSTS, getHost } from "../scrape/route";
 import { formatDateTime, formatPrice } from "@/components/utils/auxifunctions";
 import { generateEmail } from "@/components/utils/mailer";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 
-async function GET(req: NextApiRequest, res: NextApiResponse) {
+async function GET() {
   try {
     const products = await prisma.product.findMany({ take: 4 });
 
     if (!products) {
-      return NextResponse.json(
-        { response: "no product" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "No product"));
     }
     for (const product of products) {
       //fetching new prices
       const newprice = await getPrice(product.url);
-      // const receiverEmail = product.ownerId;
 
-      if (!newprice) return NextResponse.json("erro");
+      if (!newprice) return NextResponse.json(errorres(401, "No new prices"));
 
       //updating products table
 
@@ -88,24 +83,13 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
           });
         }
       }
-
     }
 
-    return NextResponse.json(
-      { response: "updated" },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(successres(200, "Updated Product"));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 

@@ -5,30 +5,21 @@ import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 import prisma from "@/lib/prisma";
 import { getUser } from "@/components/utils/auxifunctions";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 
 async function POST(req: any, res: NextApiResponse) {
   try {
     const session = await getUser();
 
     if (!session) {
-      return NextResponse.json(
-        { response: "Invalid" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "Invalid"));
     }
 
     const email = session.user?.email;
     const { id } = await req.json();
 
     if (!email) {
-      return NextResponse.json(
-        { response: "not found" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(404, "Not found"));
     }
 
     const product = await prisma.product.findUnique({
@@ -37,14 +28,14 @@ async function POST(req: any, res: NextApiResponse) {
     });
 
     if (!product) {
-      return NextResponse.json({ response: "not owner" }, { status: 200 });
+      return NextResponse.json(errorres(200, "No product"));
     }
 
     // Check if the user is the owner of the product
     const isOwner = product.owner.some((user) => user.email === email);
 
     if (!isOwner) {
-      return NextResponse.json({ response: "not owner" }, { status: 200 });
+      return NextResponse.json(errorres(401, "Not the owner"));
     }
 
     if (product.owner.length === 1) {
@@ -60,8 +51,6 @@ async function POST(req: any, res: NextApiResponse) {
           id,
         },
       });
-
-     
     } else {
       await prisma.user.update({
         where: { email },
@@ -71,24 +60,13 @@ async function POST(req: any, res: NextApiResponse) {
           },
         },
       });
-
     }
 
-    return NextResponse.json(
-      { response: "Deleted" },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(successres(200, "Deleted Product"));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 export { POST };

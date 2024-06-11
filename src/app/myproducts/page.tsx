@@ -10,21 +10,40 @@ import { Button } from "@/components/ui/button";
 import { Appbar } from "@/components/AppBar";
 import Link from "next/link";
 import { formatPrice } from "@/components/utils/auxifunctions";
+import { useDispatch } from "react-redux";
+import {
+  setLoader,
+  showToast,
+} from "@/components/redux/slices/appConfiigSlice";
 type Props = {};
 
 export default function MyProducts({}: Props) {
   const [productList, setProductList] = useState<ProductDetailsProp[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   useEffect(() => {
     fetchProducts();
   }, []);
 
   async function fetchProducts() {
     try {
+      setIsLoading(true);
       const p = await axios.get("/api/getproducts");
-      setProductList(p.data.response);
-    } catch (error) {}
+
+      setProductList(p.data.result);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   }
-  ``;
+
+  if (isLoading) {
+    return (
+      <div className="w-full mt-20 -full flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="px-10">
       <div className="text-center w-full text-3xl font-bold my-6">
@@ -59,15 +78,25 @@ export function ProductCard({
   alltimehighprice,
   fetchProducts,
 }: ProductCardProps) {
+  const dispatch = useDispatch();
   const [isRemoveLoading, setIsRemoveLoading] = useState<boolean>(false);
   async function removeProduct() {
     try {
+      dispatch(setLoader(true));
       setIsRemoveLoading(true);
-      await axios.post("/api/removeproduct", { id });
+      const res = await axios.post("/api/removeproduct", { id });
+
+      dispatch(
+        showToast({
+          type: res.data.status,
+          message: res.data.result,
+        })
+      );
       if (!fetchProducts) return;
       fetchProducts();
     } catch (e) {
     } finally {
+      dispatch(setLoader(false));
       setIsRemoveLoading(false);
     }
   }

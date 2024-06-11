@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
 import prisma from "@/lib/prisma";
 import { getUser } from "@/components/utils/auxifunctions";
+import { errorres, successres } from "@/components/utils/responseWrapper";
 
 
 
@@ -13,23 +14,13 @@ async function GET() {
     const session = await getUser();
 
     if (!session) {
-      return NextResponse.json(
-        { response: "Invalid" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401,"Invalid"));
     }
 
     const email = session.user?.email;
 
     if (!email) {
-      return NextResponse.json(
-        { response: "not found" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "Not email"));
     }
     const user = await prisma.user.findUnique({
       where: { email },
@@ -37,12 +28,7 @@ async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { response: "not found" },
-        {
-          status: 200,
-        }
-      );
+      return NextResponse.json(errorres(401, "Not user"));
     }
 
     // Get all products owned by other users
@@ -55,21 +41,11 @@ async function GET() {
       take: 10,
     });
 
-    return NextResponse.json(
-      { response: productsOwnedByOthers },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(successres(200,productsOwnedByOthers));
   } catch (e) {
     console.log(e);
 
-    return NextResponse.json(
-      { response: e },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json(errorres(500, "Server Error"));
   }
 }
 export { GET };
