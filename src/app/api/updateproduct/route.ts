@@ -75,8 +75,7 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
         });
         // send email
 
-        let owners = products.owner;
-        console.log("owners", owners);
+        const owners = products.owner;
 
         for (const owner of owners) {
           const formatted = formatPrice(newprice);
@@ -159,7 +158,7 @@ async function getAmazon(url: string): Promise<number> {
   await browser.close();
 
   const strr = item!.price.replace(/,/g, "");
-  let price = parseFloat(strr);
+  const price = parseFloat(strr);
 
   return price;
 }
@@ -187,7 +186,7 @@ async function getFlipkart(url: string): Promise<number> {
   });
 
   await browser.close();
-  let str = item?.str;
+  const str = item?.str;
 
   const strr = str!.slice(1).replace(/,/g, "");
   const price = parseFloat(strr);

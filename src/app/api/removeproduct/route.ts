@@ -37,7 +37,6 @@ async function POST(req: any, res: NextApiResponse) {
     });
 
     if (!product) {
-      console.log("Product not found.");
       return NextResponse.json({ response: "not owner" }, { status: 200 });
     }
 
@@ -45,8 +44,7 @@ async function POST(req: any, res: NextApiResponse) {
     const isOwner = product.owner.some((user) => user.email === email);
 
     if (!isOwner) {
-      console.log("You are not the owner of this product.");
-      return;
+      return NextResponse.json({ response: "not owner" }, { status: 200 });
     }
 
     if (product.owner.length === 1) {

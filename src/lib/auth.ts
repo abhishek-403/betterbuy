@@ -20,16 +20,15 @@ export const NEXT_AUTH_CONFIG = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     signIn: async (data: any) => {
-      console.log(data.user);
       
-      let user = await prisma.user.findFirst({
+      const user = await prisma.user.findFirst({
         where: {
           email: data.user.email,
         },
       });
       
       if (user) return true;
-      let newUser = await prisma.user.create({
+      const newUser = await prisma.user.create({
         data: {
           name: data.user.name,
           email: data.user.email,

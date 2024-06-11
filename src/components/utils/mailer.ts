@@ -22,8 +22,8 @@ export function generateEmail({
   title,
   price,
 }: generateEmailProps) {
-  let html = setHtmltemplate(title, img, link, price);
-  let mailOptions = {
+  const html = setHtmltemplate(title, img, link, price);
+  const mailOptions = {
     from: "abhishek79009@gmail.com",
     to: receiverEmail,
     subject: "Got you a Better News from BuyItBetter",

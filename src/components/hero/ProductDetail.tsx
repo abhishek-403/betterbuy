@@ -14,7 +14,7 @@ export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
 
   async function handleTrack() {
-    let request = axios.post("/api/addproduct", {
+    const request = axios.post("/api/addproduct", {
       name: details.name,
       price: details.price,
       currency: details.currency,
@@ -37,7 +37,6 @@ export default function ProductDetail({ details }: Props) {
         },
       })
     );
-    console.log((await request).data);
   }
   if (!details.name) {
     // return <div className="flex  m-10 items-center justify-center">No details</div>;

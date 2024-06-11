@@ -34,14 +34,12 @@ async function POST(req: any, res: NextApiResponse) {
       return NextResponse.json({ response: "not found" }, { status: 200 });
     }
 
-    console.log(id);
     const existingProd = await prisma.product.findFirst({
       where: {
         id,
       },
     });
     if (existingProd) {
-      console.log("existing", session?.user.email);
 
       const res = await axios.post(
         `${NEXT_CLIENT_URL}/api/updateproductowner`,
@@ -71,7 +69,7 @@ async function POST(req: any, res: NextApiResponse) {
       },
     });
 
-    let date = formatDateTime(new Date());
+    const date = formatDateTime(new Date());
     await prisma.pricecheckpoints.create({
       data: {
         price,

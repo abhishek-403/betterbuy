@@ -18,11 +18,9 @@ export default function MyProducts({}: Props) {
 
   async function fetchProducts() {
     try {
-      let p = await axios.get("/api/getproducts");
+      const p = await axios.get("/api/getproducts");
       setProductList(p.data.response);
-      console.log(p.data.response);
     } catch (error) {
-      console.log(error);
     }
   }``
   return (
@@ -62,11 +60,9 @@ export function ProductCard({
   async function removeProduct() {
     try {
       const res = await axios.post("/api/removeproduct", { id });
-      console.log(res.data);
       if (!fetchProducts) return;
       fetchProducts();
     } catch (e) {
-      console.log(e);
     }
   }
 

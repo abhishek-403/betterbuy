@@ -37,7 +37,6 @@ async function GET() {
     });
 
     if (!user) {
-      console.log("User not found.");
       return NextResponse.json(
         { response: "not found" },
         {

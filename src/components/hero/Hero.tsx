@@ -40,15 +40,11 @@ export default function Hero({}: Props) {
   async function handleClick() {
     try {
       if (!url) return;
-      let response = await axios.post("/api/scrape", {
+      const response = await axios.post("/api/scrape", {
         url,
       });
-      // if (!response.data.response.id) return;
       setDetails({ ...response.data.response, url });
-      console.log(response.data.response);
-      console.log(details);
     } catch (e) {
-      console.log(e);
     }
   }
 
@@ -88,7 +84,6 @@ export default function Hero({}: Props) {
       <Button
         onClick={async () => {
           const a = await axios.get("/api/updateproduct");
-          console.log(a.data);
         }}
       >
         update
@@ -135,18 +130,9 @@ export function HeroProductCard({
 }: ProductCardProps) {
   const dispatch = useDispatch();
 
-  // async function removeProduct() {
-  //   try {
-  //     const res = await axios.post("/api/removeproduct", { id });
-  //     console.log(res.data);
-  //     if (!fetchProducts) return;
-  //     fetchProducts();
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // }
+
   async function handleTrack() {
-    let request = axios
+    const request = axios
       .post("/api/updateproductowner", {
         id,
       })

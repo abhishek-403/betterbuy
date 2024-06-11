@@ -94,9 +94,9 @@ async function getAmazon(url: string) {
   await browser.close();
 
   const strr = item!.price.replace(/,/g, "");
-  let price = parseFloat(strr);
+  const price = parseFloat(strr);
 
-  let itemFinal = {
+  const itemFinal = {
     name: item?.name,
     image: item?.img,
     price,
@@ -137,14 +137,14 @@ async function getFlipkart(url: string) {
   });
 
   await browser.close();
-  let str = item?.str;
+  const str = item?.str;
   let currency;
   if (str!.charAt(0) === "$" || str!.charAt(0) === "₹") {
     currency = str!.charAt(0);
   }
   const strr = str!.slice(1).replace(/,/g, "");
   const price = parseFloat(strr);
-  let itemFinal = {
+  const itemFinal = {
     provider: HOSTS.Flipkart,
     name: item?.name,
     image: item?.img,

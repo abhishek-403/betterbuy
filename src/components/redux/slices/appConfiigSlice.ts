@@ -4,10 +4,8 @@ import axios from "axios";
 
 export const getheroProducts = createAsyncThunk("/heroproducts", async () => {
   try {
-    // thunkAPI.dispatch(setSpinner(true));
 
     const response = await axios.get("/api/getheroproducts");
-    console.log("herop", response.data);
 
     return response.data;
   } catch (e) {
@@ -15,7 +13,6 @@ export const getheroProducts = createAsyncThunk("/heroproducts", async () => {
 
     return Promise.reject(e);
   } finally {
-    // thunkAPI.dispatch(setSpinner(false));
   }
 });
 
