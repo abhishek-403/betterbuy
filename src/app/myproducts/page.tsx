@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { ProductCardProps, ProductDetailsProp, TITLE_LENGTH } from "../../components/utils/type";
+import {
+  ProductCardProps,
+  ProductDetailsProp,
+  TITLE_LENGTH,
+} from "../../components/utils/type";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Appbar } from "@/components/AppBar";
 import Link from "next/link";
 import { formatPrice } from "@/components/utils/auxifunctions";
 type Props = {};
-
-
 
 export default function MyProducts({}: Props) {
   const [productList, setProductList] = useState<ProductDetailsProp[]>([]);
@@ -20,9 +22,9 @@ export default function MyProducts({}: Props) {
     try {
       const p = await axios.get("/api/getproducts");
       setProductList(p.data.response);
-    } catch (error) {
-    }
-  }``
+    } catch (error) {}
+  }
+  ``;
   return (
     <div className="px-10">
       <div className="text-center w-full text-3xl font-bold my-6">
@@ -57,12 +59,16 @@ export function ProductCard({
   alltimehighprice,
   fetchProducts,
 }: ProductCardProps) {
+  const [isRemoveLoading, setIsRemoveLoading] = useState<boolean>(false);
   async function removeProduct() {
     try {
-      const res = await axios.post("/api/removeproduct", { id });
+      setIsRemoveLoading(true);
+      await axios.post("/api/removeproduct", { id });
       if (!fetchProducts) return;
       fetchProducts();
     } catch (e) {
+    } finally {
+      setIsRemoveLoading(false);
     }
   }
 
@@ -130,12 +136,14 @@ export function ProductCard({
         <Link href={url} target="_blank" className="flex-1">
           <Button variant={"quarterny"}>Buy now</Button>
         </Link>
-        {/* <Button variant={"default"}>More info</Button> */}
-        <Button variant={"destructive"} onClick={removeProduct}>
+        <Button
+          variant={"destructive"}
+          onClick={removeProduct}
+          disabled={isRemoveLoading}
+        >
           Remove
         </Button>
       </div>
     </div>
   );
 }
-

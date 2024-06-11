@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import { ProductDetailsProp, STAGES } from "../utils/type";
 import { Button } from "../ui/button";
 import { toast } from "react-toastify";
@@ -12,8 +13,11 @@ type Props = {
 
 export default function ProductDetail({ details }: Props) {
   const dispatch = useDispatch();
+  
+  const [isTrackLoading, setIsTrackLoading] = useState<boolean>(false);
 
   async function handleTrack() {
+    setIsTrackLoading(true)
     const request = axios.post("/api/addproduct", {
       name: details.name,
       price: details.price,
@@ -22,7 +26,7 @@ export default function ProductDetail({ details }: Props) {
       provider: details.provider,
       url: details.url,
       id: details.id,
-    });
+    }).finally(()=>setIsTrackLoading(false));
 
     dispatch(
       showToast({
@@ -43,22 +47,34 @@ export default function ProductDetail({ details }: Props) {
     return;
   }
   return (
-    <div className="flex gap-2 ">
-      <div className="flex  ">
+    <div className="flex gap-2 border-2 w-fit mx-auto">
+      <div className="flex bg-zinc-100 rounded-lg m-3 ">
         {details.image && (
-          <img alt="" className="p-4  w-[350px] mix- " src={details.image} />
+          <img
+            alt=""
+            className="p-4  w-[300px] aspect-square object-contain mix-blend-multiply"
+            src={details.image}
+          />
         )}
       </div>
-      <div className="flex flex-col gap-4 p-4 mt-4  ">
+      <div className="flex flex-col gap-6 py-2  ">
         <div className="text-xl font-bold max-w-[500px] ">{details.name}</div>
-        <div className="flex">
-          <div className="text-xl font-bold">{details.currency}</div>
-          <div className="text-xl font-bold">{formatPrice(details.price)}</div>
-        </div>
+        <Button
+          variant={"secondary"}
+          className="flex gap-2 py-6 w-fit  font-bold text-xl"
+        >
+          <div>Current price :</div>
+          <div className="flex gap-1">
+            <div>{details.currency}</div>
+            <div className="">{formatPrice(details.price)}</div>
+          </div>
+        </Button>
+
         <Button
           onClick={handleTrack}
           variant={"destructive"}
-          className="mx-auto mt-auto text-xl font-bold w-32 h-12"
+          className=" mt-auto text-xl font-bold w-32 h-12"
+          disabled={isTrackLoading}
         >
           Track
         </Button>

@@ -16,7 +16,7 @@ export const HOSTS: { [key: string]: string } = {
 
 async function POST(req: Request, res: Response) {
   try {
-    const { url } = await req.json();
+    const { url }:string = await req.json();
     const host = getHost(url);
 
     const parsedUrl = new URLSearchParams(new URL(url).search);
