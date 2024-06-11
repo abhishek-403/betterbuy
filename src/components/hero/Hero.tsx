@@ -102,17 +102,16 @@ export default function Hero({}: Props) {
 
 function HeroProducts() {
   const dispatch = useDispatch();
+  const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
 
   useEffect(() => {
     //@ts-ignore
     dispatch(getheroProducts());
   }, []);
-  const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
 
   return (
     <div className="w-full flex gap-4 flex-wrap">
-      {heroproducts.length > 0 &&
-        heroproducts.map((prod: any, i: number) => {
+      {heroproducts.length > 0 && heroproducts.map((prod: any, i: number) => {
           return <HeroProductCard key={i} {...prod} />;
         })}
     </div>
@@ -171,7 +170,7 @@ export function HeroProductCard({
   }
   return (
     <div className="flex flex-col w-[400px] items-center gap-8 border-2 p-4">
-      <div className="flex flex-col gap-4 items-center">
+      <div className="flex flex-col gap-6 items-center">
         <div className="bg-zinc-100 rounded-lg">
           <img
             src={image}
@@ -179,7 +178,7 @@ export function HeroProductCard({
             className="w-[300px] aspect-square object-contain mix-blend-multiply"
           />
         </div>
-        <div className="text-xl font-base">
+        <div className="text-xl font-base ">
           {name.length >= TITLE_LENGTH ? (
             <p>{name.substring(0, TITLE_LENGTH)}...</p>
           ) : (

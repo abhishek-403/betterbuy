@@ -20,9 +20,8 @@ export default function RootLayout({
       <body>
         <Providers>
           <div className="flex flex-col gap-4 p-4">
-
-          <Appbar />
-          {children}
+            <Appbar />
+            {children}
           </div>
         </Providers>
       </body>

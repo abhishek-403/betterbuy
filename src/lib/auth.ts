@@ -7,21 +7,7 @@ import prisma from "./prisma";
 
 export const NEXT_AUTH_CONFIG = {
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        username: { label: "email", type: "text", placeholder: "" },
-        password: { label: "password", type: "password", placeholder: "" },
-      },
-      async authorize(credentials: any) {
-        return {
-          id: "user1",
-          name: "asd",
-          userId: "asd",
-          email: "ramdomEmail",
-        };
-      },
-    }),
+  
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -34,11 +20,14 @@ export const NEXT_AUTH_CONFIG = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     signIn: async (data: any) => {
+      console.log(data.user);
+      
       let user = await prisma.user.findFirst({
         where: {
-          email: data.email,
+          email: data.user.email,
         },
       });
+      
       if (user) return true;
       let newUser = await prisma.user.create({
         data: {

@@ -35,6 +35,11 @@ async function GET(req: any, res: NextApiResponse) {
       );
     }
     const products = await prisma.product.findMany({
+      where:{
+        ownerId :{
+          not:email
+        }
+      },
       take:10
     });
 

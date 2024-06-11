@@ -24,7 +24,7 @@ export default function MyProducts({}: Props) {
     } catch (error) {
       console.log(error);
     }
-  }
+  }``
   return (
     <div className="px-10">
       <div className="text-center w-full text-3xl font-bold my-6">
@@ -72,7 +72,7 @@ export function ProductCard({
 
   return (
     <div className="flex flex-col w-[400px] items-center gap-8 border-2 p-4">
-      <div className="flex flex-col gap-4 items-center">
+      <div className="flex flex-col gap-6 items-center">
         <div className="bg-zinc-100 rounded-lg">
           <img
             src={image}
