@@ -1,5 +1,7 @@
-import { StaticImageData } from "next/image";
-
+export const HOST_FLIPKART = "flipkart";
+export const HOST_AMAZON = "amazon";
+export const HOST_INVALID = "invalid";
+export const HOST_NA = "na";
 export interface ProductCardProps extends ProductDetailsProp {
   fetchProducts?: () => void;
 }
@@ -18,9 +20,9 @@ export type ProductDetailsProp = {
   alltimelowprice: number;
 };
 export type PricePointProps = {
-  id:number,
-  value:number;
-  date:Date
+  id: number;
+  value: number;
+  date: Date;
 };
 
 export enum STAGES {
@@ -29,6 +31,5 @@ export enum STAGES {
   FAILURE,
   PROMISE,
 }
-
 
 export const TITLE_LENGTH = 65;

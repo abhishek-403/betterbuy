@@ -47,12 +47,12 @@ export const Appbar = () => {
           BetterBuy
         </Link>
       </div>
-      <div className="flex items-center">
-        <Signup />
+      <div className="flex items-center gap-2">
         {/* <ToggleTheme /> */}
         <div>
           <Button onClick={() => router.push("/myproducts")}>Products</Button>
         </div>
+        <Signup />
       </div>
     </div>
   );
@@ -62,7 +62,7 @@ function Signup() {
 
   const session = useSession();
   return (
-    <div>
+    <Button variant={"destructive"}>
       {session.status === "loading" ? (
         <div>Loading...</div>
       ) : session.status === "unauthenticated" ? (
@@ -72,12 +72,12 @@ function Signup() {
       ) : (
         <button onClick={() => signOut()}>Sign out</button>
       )}
-    </div>
+    </Button>
   );
 }
 
 export function handleToast(toastData: any) {
-
+  
   switch (toastData.type) {
     case STAGES.LOADING:
       toast.loading(toastData.message);

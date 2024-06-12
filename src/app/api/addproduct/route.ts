@@ -3,6 +3,7 @@ import { errorres, successres } from "@/components/utils/responseWrapper";
 import prisma from "@/lib/prisma";
 import axios from "axios";
 import { NextResponse } from "next/server";
+import {} from '@/components/utils/auxifunctions'
 const NEXT_CLIENT_URL = "http://localhost:3000";
 
 async function POST(req: any, res: Response) {

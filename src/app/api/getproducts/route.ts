@@ -9,7 +9,7 @@ async function getUser() {
   return session;
 }
 
-async function GET() {
+async function handler() {
   const session = await getUser();
 
   if (!session) {
@@ -43,5 +43,5 @@ async function GET() {
     return NextResponse.json(errorres(500, "Server Error"));
   }
 }
-export { GET };
+export { handler as GET };
 

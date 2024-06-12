@@ -1,16 +1,16 @@
 //@ts-nocheck
+import { getHost } from "@/components/utils/auxifunctions";
 import { errorres, successres } from "@/components/utils/responseWrapper";
+import {
+  HOST_AMAZON,
+  HOST_FLIPKART,
+  HOST_INVALID,
+  HOST_NA,
+} from "@/components/utils/type";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
-export const HOSTS: { [key: string]: string } = {
-  Flipkart: "flipkart",
-  Amazon: "amazon",
-  Invalid: "invalid",
-  NA: "na",
-};
-
-async function POST(req: Request, res: Response) {
+async function handler(req: Request, res: Response) {
   try {
     const { url }: string = await req.json();
     const host = getHost(url);
@@ -20,20 +20,21 @@ async function POST(req: Request, res: Response) {
     let prodDetails;
     let productId;
 
-    if (host === HOSTS.Amazon) {
+    if (host === HOST_AMAZON) {
       prodDetails = await getAmazon(url);
       const match = url.match(/\/dp\/([A-Z0-9]+)/);
       productId = match ? match[1] : null;
-    } else if (host === HOSTS.Flipkart) {
+    } else if (host === HOST_FLIPKART) {
       productId = parsedUrl.get("pid");
       prodDetails = await getFlipkart(url);
-    } else if (host === HOSTS.NA) {
+    } else if (host === HOST_NA) {
       prodDetails = { message: "Service form this host not available" };
-    } else if (host === HOSTS.Invalid) {
+    } else if (host === HOST_INVALID) {
       prodDetails = { message: "Invalid url" };
     }
 
-    return NextResponse.json(successres(200, { ...prodDetails, id: productId })
+    return NextResponse.json(
+      successres(200, { ...prodDetails, id: productId })
     );
   } catch (e) {
     return NextResponse.json(errorres(500, "Server Error"));
@@ -84,7 +85,7 @@ async function getAmazon(url: string) {
     image: item?.img,
     price,
     currency: item?.currency,
-    provider: HOSTS.Amazon,
+    provider: HOST_AMAZON,
   };
 
   return itemFinal;
@@ -105,9 +106,9 @@ async function getFlipkart(url: string) {
     try {
       const itemDiv = document.querySelector(".C7fEHH");
 
-      const name = itemDiv.querySelector(".VU-ZEz")?.textContent;
+      const name = itemDiv!.querySelector(".VU-ZEz")?.textContent;
 
-      const str = itemDiv.querySelector(".Nx9bqj.CxhGGd")?.textContent;
+      const str = itemDiv!.querySelector(".Nx9bqj.CxhGGd")?.textContent;
 
       const images = document.querySelectorAll(".DByuf4.IZexXJ.jLEJ7H");
 
@@ -128,7 +129,7 @@ async function getFlipkart(url: string) {
   const strr = str!.slice(1).replace(/,/g, "");
   const price = parseFloat(strr);
   const itemFinal = {
-    provider: HOSTS.Flipkart,
+    provider: HOST_FLIPKART,
     name: item?.name,
     image: item?.img,
     price,
@@ -138,21 +139,5 @@ async function getFlipkart(url: string) {
   return itemFinal;
 }
 
-export function getHost(url: string) {
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname;
+export { handler as POST };
 
-    if (hostname.includes("amazon")) {
-      return HOSTS.Amazon;
-    } else if (hostname.includes("flipkart")) {
-      return HOSTS.Flipkart;
-    } else {
-      return HOSTS.NA;
-    }
-  } catch (error) {
-    return HOSTS.Invalid;
-  }
-}
-
-export { POST };

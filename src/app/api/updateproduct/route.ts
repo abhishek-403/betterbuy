@@ -1,13 +1,12 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import puppeteer from "puppeteer";
-import { HOSTS, getHost } from "../scrape/route";
-import { formatDateTime, formatPrice } from "@/components/utils/auxifunctions";
+import { formatDateTime, formatPrice, getHost } from "@/components/utils/auxifunctions";
 import { generateEmail } from "@/components/utils/mailer";
 import { errorres, successres } from "@/components/utils/responseWrapper";
+import { HOST_AMAZON, HOST_FLIPKART } from "@/components/utils/type";
+import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import puppeteer from "puppeteer";
 
-async function GET() {
+async function handler() {
   try {
     const products = await prisma.product.findMany({ take: 4 });
 
@@ -98,9 +97,9 @@ async function getPrice(url: string): Promise<number> {
     const host = getHost(url);
 
     let prodDetails;
-    if (host === HOSTS.Amazon) {
+    if (host === HOST_AMAZON) {
       prodDetails = await getAmazon(url);
-    } else if (host === HOSTS.Flipkart) {
+    } else if (host === HOST_FLIPKART) {
       prodDetails = await getFlipkart(url);
     }
     if (!prodDetails) return 0;
@@ -178,4 +177,5 @@ async function getFlipkart(url: string): Promise<number> {
   return price;
 }
 
-export { GET };
+export { handler as POST };
+

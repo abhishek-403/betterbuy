@@ -1,13 +1,10 @@
-import { NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { NEXT_AUTH_CONFIG } from "../../../lib/auth";
-import prisma from "@/lib/prisma";
 import { getUser } from "@/components/utils/auxifunctions";
 import { errorres, successres } from "@/components/utils/responseWrapper";
+import prisma from "@/lib/prisma";
+import { NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
-async function POST(req: any, res: NextApiResponse) {
+async function handler(req: any, res: NextApiResponse) {
   try {
     const session = await getUser();
 
@@ -69,4 +66,5 @@ async function POST(req: any, res: NextApiResponse) {
     return NextResponse.json(errorres(500, "Server Error"));
   }
 }
-export { POST };
+export { handler as POST };
+

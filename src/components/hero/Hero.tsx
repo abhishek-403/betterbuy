@@ -1,18 +1,22 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-import { setLoader, showToast } from "../redux/slices/appConfiigSlice";
+import {
+  getHeroProduct,
+  setLoader,
+  showToast,
+} from "../redux/slices/appConfiigSlice";
 import { Button } from "../ui/button";
 import { formatPrice } from "../utils/auxifunctions";
 import {
   ProductCardProps,
   ProductDetailsProp,
-  STAGES,
-  TITLE_LENGTH,
+  TITLE_LENGTH
 } from "../utils/type";
+import Image from "next/image";
 type Props = {};
 
 export default function Hero({}: Props) {
@@ -91,24 +95,18 @@ export default function Hero({}: Props) {
 }
 
 function HeroProducts() {
-  // const heroproducts = useSelector((s: any) => s.appConfigReducer.heroProducts);
-  const [isHeroLoading, setIsHeroLoading] = useState<boolean>(false);
-  const [heroproducts, setHeroproducts] = useState<[]>([]);
+  const hero = useSelector((s: any) => s.appConfigReducer.heroProducts);
+  const isHeroLoading = useSelector(
+    (s: any) => s.appConfigReducer.isHeroLoading
+  );
 
-  useEffect(() => {
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    
     //@ts-ignore
-    getheroProducts();
-  }, []);
-  async function getheroProducts() {
-    try {
-      setIsHeroLoading(true);
-      const response = await axios.get("/api/getheroproducts");
-      setHeroproducts(response.data.result);
-    } catch (e) {
-    } finally {
-      setIsHeroLoading(false);
-    }
-  }
+    dispatch(getHeroProduct());
+  },[])
   if (isHeroLoading) {
     return (
       <div className="w-full mt-20 -full flex items-center justify-center">
@@ -117,13 +115,15 @@ function HeroProducts() {
     );
   }
 
+  if (typeof hero !== typeof []) return;
+
   return (
     <div className="flex flex-col">
       <div className="text-3xl my-4 font-bold text-center">Hero Products</div>
 
       <div className="w-full flex gap-4 flex-wrap">
-        {heroproducts.length > 0 &&
-          heroproducts.map((prod: any, i: number) => {
+        {hero.length > 0 &&
+          hero.map((prod: any, i: number) => {
             return <HeroProductCard key={i} {...prod} />;
           })}
       </div>
@@ -232,18 +232,17 @@ export function HeroProductCard({
       setIsTrackLoading(true);
       dispatch(setLoader(true));
       const res = await axios.post("/api/updateproductowner", { id });
-
-      //@ts-ignore
-      dispatch(getheroProducts());
       dispatch(
         showToast({
           type: res.data.status,
           message: res.data.result,
         })
       );
+      dispatch(setLoader(false));
+      //@ts-ignore
+      dispatch(getHeroProduct())
     } catch (e) {
     } finally {
-      dispatch(setLoader(false));
       setIsTrackLoading(false);
     }
   }
@@ -284,11 +283,7 @@ export function HeroProductCard({
             <div>Lowest price :</div>
             <div className="flex gap-1">
               <div>{currency}</div>
-              <div className="">
-                {alltimelowprice === null
-                  ? formatPrice(price)
-                  : formatPrice(alltimelowprice!)}
-              </div>
+              <div className="">{formatPrice(alltimelowprice)}</div>
             </div>
           </Button>
           <Button
@@ -298,11 +293,7 @@ export function HeroProductCard({
             <div>Highest price :</div>
             <div className="flex gap-1">
               <div>{currency}</div>
-              <div className="">
-                {alltimehighprice === null
-                  ? formatPrice(price)
-                  : formatPrice(alltimehighprice!)}
-              </div>
+              <div className="">{formatPrice(alltimehighprice)}</div>
             </div>
           </Button>
         </div>

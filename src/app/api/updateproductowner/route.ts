@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
 
-async function POST(req: Request, res: NextApiResponse) {
+async function handler(req: Request, res: NextApiResponse) {
   try {
     const { id, userEmail } = await req.json();
     const session = await getUser();
@@ -68,5 +68,5 @@ async function POST(req: Request, res: NextApiResponse) {
     return NextResponse.json(errorres(500, "Server error"));
   }
 }
-export { POST };
+export { handler as POST };
 
