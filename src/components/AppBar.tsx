@@ -50,7 +50,7 @@ export const Appbar = () => {
       <div className="flex items-center gap-2">
         {/* <ToggleTheme /> */}
         <div>
-          <Button onClick={() => router.push("/myproducts")}>Products</Button>
+          <Button onClick={() => router.push("/myproducts")}>My Products</Button>
         </div>
         <Signup />
       </div>

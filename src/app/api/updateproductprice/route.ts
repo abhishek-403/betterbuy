@@ -1,4 +1,8 @@
-import { formatDateTime, formatPrice, getHost } from "@/components/utils/auxifunctions";
+import {
+  formatDateTime,
+  formatPrice,
+  getHost,
+} from "@/components/utils/auxifunctions";
 import { generateEmail } from "@/components/utils/mailer";
 import { errorres, successres } from "@/components/utils/responseWrapper";
 import { HOST_AMAZON, HOST_FLIPKART } from "@/components/utils/type";
@@ -6,8 +10,16 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
-async function handler() {
+async function handler(req: Response, res: Response) {
   try {
+    const { key, email } = await req.json();
+    if (!key || !email) {
+      return NextResponse.json(errorres(401, "Invalid Request"));
+    }
+    
+    if (key !== process.env.UPDATE_PRODUCT_KEY || email !== process.env.ADMIN_EMAIL) {
+      return NextResponse.json(errorres(401, "Invalid Parameters"));
+    }
     const products = await prisma.product.findMany({ take: 4 });
 
     if (!products) {
@@ -178,4 +190,3 @@ async function getFlipkart(url: string): Promise<number> {
 }
 
 export { handler as POST };
-

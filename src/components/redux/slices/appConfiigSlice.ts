@@ -5,7 +5,7 @@ import axios from "axios";
 export const getHeroProduct = createAsyncThunk("/getheroproduct", async () => {
   try {
     const response = await axios.get("/api/getheroproducts");
-    
+
     return Promise.resolve(response.data.result);
   } catch (e) {
     return Promise.reject(e);
