@@ -7,7 +7,7 @@ import { Appbar } from "@/components/AppBar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BetterBuy",
+  title: "BuyItBetter",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <div className="flex flex-col gap-4 p-4">
+          <div className="flex flex-col   p-2 md:p-4 gap-4 ">
             <Appbar />
             {children}
           </div>

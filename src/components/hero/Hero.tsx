@@ -14,9 +14,8 @@ import { formatPrice } from "../utils/auxifunctions";
 import {
   ProductCardProps,
   ProductDetailsProp,
-  TITLE_LENGTH
+  TITLE_LENGTH,
 } from "../utils/type";
-import Image from "next/image";
 type Props = {};
 
 export default function Hero({}: Props) {
@@ -54,8 +53,8 @@ export default function Hero({}: Props) {
   }
 
   return (
-    <div className="flex flex-col px-20 w-full">
-      <div className=" flex gap-4 items-center ">
+    <div className="flex flex-col px-2 md:px-20 w-full">
+      <div className="md:flex-row flex-col flex gap-4 items-center ">
         <input
           className="w-full  h-12 px-4 p-2 rounded-xl border-2 border-[#ffffff22] focus:outline outline-[#414141]"
           placeholder="Enter product URL"
@@ -63,21 +62,23 @@ export default function Hero({}: Props) {
           type="text"
           value={url}
         />
-        <Button
-          onClick={handleSearch}
-          variant={"secondary"}
-          className="w-32 text-lg  text-white font-bold rounded-xl h-12"
-          disabled={isSearchLoading}
-        >
-          Search
-        </Button>
-        <Button
-          variant={"ter"}
-          onClick={() => setUrl("")}
-          className="w-24 text-lg  rounded-xl h-12"
-        >
-          Clear
-        </Button>
+        <div className="flex  gap-2">
+          <Button
+            onClick={handleSearch}
+            variant={"secondary"}
+            className=" text-lg  text-white font-bold rounded-xl h-12"
+            disabled={isSearchLoading}
+          >
+            Search
+          </Button>
+          <Button
+            variant={"ter"}
+            onClick={() => setUrl("")}
+            className=" text-lg  rounded-xl h-12"
+          >
+            Clear
+          </Button>
+        </div>
       </div>
       {/* <Button
         onClick={async () => {
@@ -86,7 +87,7 @@ export default function Hero({}: Props) {
       >
         update
       </Button> */}
-      <div className="flex flex-col gap-6 mt-10">
+      <div className="flex flex-col gap-6 mt-4 sm:mt-10">
         <ProductDetail isSearchLoading={isSearchLoading} details={details} />
         <HeroProducts />
       </div>
@@ -102,16 +103,15 @@ function HeroProducts() {
 
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    
+  useEffect(() => {
     //@ts-ignore
     dispatch(getHeroProduct());
-  },[])
+  }, []);
   if (isHeroLoading) {
     return (
-      <div className="w-full mt-20 -full flex items-center justify-center">
+      <Button variant={"ghost"} className=" mt-20 -full flex items-center justify-center">
         Loading...
-      </div>
+      </Button>
     );
   }
 
@@ -168,17 +168,17 @@ export function ProductDetail({ details, isSearchLoading }: ProductProps) {
 
   if (isSearchLoading) {
     return (
-      <div className="w-full mt-10 -full flex items-center justify-center">
+      <Button variant={"ghost"} className=" mt-10 -full flex items-center justify-center">
         Loading...
-      </div>
+      </Button>
     );
   }
   if (!details.name) {
     return;
   }
   return (
-    <div className="flex gap-2 border-2 w-fit mx-auto">
-      <div className="flex bg-zinc-100 rounded-lg m-3 ">
+    <div className="flex-col md:flex-row flex gap-2 p-2 border-2 w-fit mx-auto">
+      <div className="flex bg-zinc-100 rounded-lg m-3">
         {details.image && (
           <img
             alt=""
@@ -187,7 +187,7 @@ export function ProductDetail({ details, isSearchLoading }: ProductProps) {
           />
         )}
       </div>
-      <div className="flex flex-col gap-6 py-2  ">
+      <div className="flex flex-col gap-6 p-2  ">
         <div className="text-xl font-bold max-w-[500px] ">{details.name}</div>
         <Button
           variant={"secondary"}
@@ -203,7 +203,7 @@ export function ProductDetail({ details, isSearchLoading }: ProductProps) {
         <Button
           onClick={handleTrack}
           variant={"destructive"}
-          className=" mt-auto text-xl font-bold w-32 h-12"
+          className=" mt-auto text-xl font-bold w-32 h-12 mx-auto sm:mx-0"
           disabled={isTrackLoading}
         >
           Track
@@ -240,7 +240,7 @@ export function HeroProductCard({
       );
       dispatch(setLoader(false));
       //@ts-ignore
-      dispatch(getHeroProduct())
+      dispatch(getHeroProduct());
     } catch (e) {
     } finally {
       setIsTrackLoading(false);

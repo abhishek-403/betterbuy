@@ -31,7 +31,7 @@ export const Appbar = () => {
     }
   }, [isloading]);
   return (
-    <div className="relative flex justify-between items-center px-10 border-2 rounded-full py-3">
+    <div className="relative flex justify-between items-center px-4 border-2 rounded-full py-3 md:px-10">
       <div className="absolute">
         <LoadingBar
           height={4}
@@ -43,8 +43,8 @@ export const Appbar = () => {
         <Toaster />
       </div>
       <div>
-        <Link href="/" className="text-2xl font-bold">
-          BetterBuy
+        <Link href="/" className="text-xl md:text-2xl font-bold ">
+          BuyItBetter
         </Link>
       </div>
       <div className="flex items-center gap-2">

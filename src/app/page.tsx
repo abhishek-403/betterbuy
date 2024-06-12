@@ -9,7 +9,7 @@ export default async function Home() {
     redirect("/signin");
   }
   return (
-    <div className="flex flex-col p-4 gap-4 w-full">
+    <div className="flex flex-col p-2 md:p-4 gap-4 w-full">
       <Hero />
     </div>
   );
