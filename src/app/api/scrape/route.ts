@@ -1,5 +1,4 @@
 //@ts-nocheck
-import { getHost } from "@/components/utils/auxifunctions";
 import { errorres, successres } from "@/components/utils/responseWrapper";
 import {
   HOST_AMAZON,
@@ -139,5 +138,21 @@ async function getFlipkart(url: string) {
   return itemFinal;
 }
 
+function getHost(url:string):string {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+
+    if (hostname.includes("amazon")) {
+      return HOST_AMAZON;
+    } else if (hostname.includes("flipkart")) {
+      return HOST_FLIPKART;
+    } else {
+      return HOST_NA;
+    }
+  } catch (error) {
+    return HOST_INVALID;
+  }
+};
 export { handler as POST };
 

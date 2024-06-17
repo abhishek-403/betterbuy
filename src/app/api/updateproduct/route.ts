@@ -1,11 +1,10 @@
 import {
   formatDateTime,
   formatPrice,
-  getHost,
 } from "@/components/utils/auxifunctions";
 import { generateEmail } from "@/components/utils/mailer";
 import { errorres, successres } from "@/components/utils/responseWrapper";
-import { HOST_AMAZON, HOST_FLIPKART } from "@/components/utils/type";
+import { HOST_AMAZON, HOST_FLIPKART, HOST_INVALID, HOST_NA } from "@/components/utils/type";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
@@ -188,5 +187,22 @@ async function getFlipkart(url: string): Promise<number> {
 
   return price;
 }
+
+function getHost(url:string):string {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+
+    if (hostname.includes("amazon")) {
+      return HOST_AMAZON;
+    } else if (hostname.includes("flipkart")) {
+      return HOST_FLIPKART;
+    } else {
+      return HOST_NA;
+    }
+  } catch (error) {
+    return HOST_INVALID;
+  }
+};
 
 export { handler as POST };
