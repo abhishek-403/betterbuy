@@ -68,12 +68,20 @@ async function getAmazon(url: string) {
     //     headless: "new",
     //   });
     // }
-    const puppeteer = await import("puppeteer");
-    browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: "new",
+
+    const browser = await playwright.chromium.launch({
+      args: [...chromium.args, "--font-render-hinting=none"], // This way fix rendering issues with specific fonts
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? await chromium.executablePath
+          : "/usr/local/bin/chromium",
+      headless:
+        process.env.NODE_ENV === "production" ? chromium.headless : true,
     });
-    const page = await browser.newPage();
+
+    const context = await browser.newContext();
+
+    const page = await context.newPage();
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
@@ -138,13 +146,19 @@ async function getFlipkart(url: string) {
     //   });
     // } else {
     // }
-    const puppeteer = await import("puppeteer");
-    browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: "new",
+    const browser = await playwright.chromium.launch({
+      args: [...chromium.args, "--font-render-hinting=none"], // This way fix rendering issues with specific fonts
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? await chromium.executablePath
+          : "/usr/local/bin/chromium",
+      headless:
+        process.env.NODE_ENV === "production" ? chromium.headless : true,
     });
 
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+
+    const page = await context.newPage();
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
