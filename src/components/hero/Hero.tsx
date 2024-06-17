@@ -121,7 +121,7 @@ function HeroProducts() {
     <div className="flex flex-col">
       <div className="text-3xl my-4 font-bold text-center">Hero Products</div>
 
-      <div className="w-full flex gap-4 flex-wrap">
+      <div className="w-full flex gap-8 flex-wrap justify-center">
         {hero.length > 0 &&
           hero.map((prod: any, i: number) => {
             return <HeroProductCard key={i} {...prod} />;
