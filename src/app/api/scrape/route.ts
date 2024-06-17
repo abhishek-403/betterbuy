@@ -53,21 +53,26 @@ async function getAmazon(url: string) {
     // });
 
     let browser: Browser | CoreBrowser;
-    if (process.env.NODE_ENV === "production") {
-      const puppeteer = await import("puppeteer-core");
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-      });
-    } else {
-      const puppeteer = await import("puppeteer");
-      browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: "new",
-      });
-    }
+    // if (process.env.NODE_ENV === "production") {
+    //   const puppeteer = await import("puppeteer-core");
+    //   browser = await puppeteer.launch({
+    //     args: chromium.args,
+    //     defaultViewport: chromium.defaultViewport,
+    //     executablePath: await chromium.executablePath(),
+    //     headless: chromium.headless,
+    //   });
+    // } else {
+    //   const puppeteer = await import("puppeteer");
+    //   browser = await puppeteer.launch({
+    //     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    //     headless: "new",
+    //   });
+    // }
+    const puppeteer = await import("puppeteer");
+    browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: "new",
+    });
     const page = await browser.newPage();
 
     await page.goto(url, {
@@ -123,21 +128,21 @@ async function getFlipkart(url: string) {
     //    defaultViewport: null,
     //  });
     let browser: Browser | CoreBrowser;
-    if (process.env.NODE_ENV === "production") {
-      const puppeteer = await import("puppeteer-core");
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-      });
-    } else {
-      const puppeteer = await import("puppeteer");
-      browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        headless: "new",
-      });
-    }
+    // if (process.env.NODE_ENV === "production") {
+    //   const puppeteer = await import("puppeteer-core");
+    //   browser = await puppeteer.launch({
+    //     args: chromium.args,
+    //     defaultViewport: chromium.defaultViewport,
+    //     executablePath: await chromium.executablePath(),
+    //     headless: chromium.headless,
+    //   });
+    // } else {
+    // }
+    const puppeteer = await import("puppeteer");
+    browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: "new",
+    });
 
     const page = await browser.newPage();
 
