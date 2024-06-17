@@ -10,7 +10,7 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 
-async function handler(req: Response, res: Response) {
+async function handler(req: any, res: Response) {
   try {
     const { key, email } = await req.json();
     if (!key || !email) {
