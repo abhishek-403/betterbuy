@@ -52,7 +52,7 @@ async function getAmazon(url: string) {
     //   defaultViewport: null,
     // });
 
-    let browser: Browser | CoreBrowser;
+    // let browser: Browser | CoreBrowser;
     // if (process.env.NODE_ENV === "production") {
     //   const puppeteer = await import("puppeteer-core");
     //   browser = await puppeteer.launch({
@@ -135,7 +135,7 @@ async function getFlipkart(url: string) {
     //    headless: true,
     //    defaultViewport: null,
     //  });
-    let browser: Browser | CoreBrowser;
+    // let browser: Browser | CoreBrowser;
     // if (process.env.NODE_ENV === "production") {
     //   const puppeteer = await import("puppeteer-core");
     //   browser = await puppeteer.launch({
