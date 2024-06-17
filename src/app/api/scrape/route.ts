@@ -36,6 +36,8 @@ async function handler(req: Request, res: Response) {
       successres(200, { ...prodDetails, id: productId })
     );
   } catch (e) {
+    console.log(e);
+    
     return NextResponse.json(errorres(500, "Server Error"));
   }
 }
