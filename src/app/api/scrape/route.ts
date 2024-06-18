@@ -7,11 +7,7 @@ import {
   HOST_NA,
 } from "@/components/utils/type";
 import { NextResponse } from "next/server";
-// import puppeteer from "puppeteer";
-import chromium from "@sparticuz/chromium-min";
-import { Browser } from "puppeteer";
-import { Browser as CoreBrowser } from "puppeteer-core";
-
+import puppeteer from "puppeteer";
 async function handler(req: Request, res: Response) {
   try {
     const { url }: string = await req.json();
@@ -52,36 +48,8 @@ async function getAmazon(url: string) {
     //   defaultViewport: null,
     // });
 
-    // let browser: Browser | CoreBrowser;
-    // if (process.env.NODE_ENV === "production") {
-    //   const puppeteer = await import("puppeteer-core");
-    //   browser = await puppeteer.launch({
-    //     args: chromium.args,
-    //     defaultViewport: chromium.defaultViewport,
-    //     executablePath: await chromium.executablePath(),
-    //     headless: chromium.headless,
-    //   });
-    // } else {
-    //   const puppeteer = await import("puppeteer");
-    //   browser = await puppeteer.launch({
-    //     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    //     headless: "new",
-    //   });
-    // }
-
-    const browser = await playwright.chromium.launch({
-      args: [...chromium.args, "--font-render-hinting=none"], // This way fix rendering issues with specific fonts
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? await chromium.executablePath
-          : "/usr/local/bin/chromium",
-      headless:
-        process.env.NODE_ENV === "production" ? chromium.headless : true,
-    });
-
-    const context = await browser.newContext();
-
-    const page = await context.newPage();
+    const browser = await getBrowser();
+    const page = await browser.newPage();
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
@@ -131,34 +99,12 @@ async function getAmazon(url: string) {
 
 async function getFlipkart(url: string) {
   try {
-    //  const browser = await puppeteer.launch({
-    //    headless: true,
-    //    defaultViewport: null,
-    //  });
-    // let browser: Browser | CoreBrowser;
-    // if (process.env.NODE_ENV === "production") {
-    //   const puppeteer = await import("puppeteer-core");
-    //   browser = await puppeteer.launch({
-    //     args: chromium.args,
-    //     defaultViewport: chromium.defaultViewport,
-    //     executablePath: await chromium.executablePath(),
-    //     headless: chromium.headless,
-    //   });
-    // } else {
-    // }
-    const browser = await playwright.chromium.launch({
-      args: [...chromium.args, "--font-render-hinting=none"], // This way fix rendering issues with specific fonts
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? await chromium.executablePath
-          : "/usr/local/bin/chromium",
-      headless:
-        process.env.NODE_ENV === "production" ? chromium.headless : true,
-    });
-
-    const context = await browser.newContext();
-
-    const page = await context.newPage();
+    // const browser = await puppeteer.launch({
+    //   headless: true,
+    //   defaultViewport: null,
+    // });
+    const browser = await getBrowser();
+    const page = await browser.newPage();
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
@@ -216,5 +162,21 @@ function getHost(url: string): string {
   } catch (error) {
     return HOST_INVALID;
   }
+}
+
+async function getBrowser() {
+  const browser = await puppeteer.launch({
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+    ],
+    executablePath:
+      process.env.NODE_ENV === "production"
+        ? process.env.PUPPETEER_EXECUTABLE_PATH
+        : puppeteer.executablePath(),
+  });
+  return browser;
 }
 export { handler as POST };

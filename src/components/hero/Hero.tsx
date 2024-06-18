@@ -121,7 +121,7 @@ function HeroProducts() {
     <div className="flex flex-col">
       <div className="text-3xl my-4 font-bold text-center">Hero Products</div>
 
-      <div className="w-full flex gap-8 flex-wrap justify-center">
+      <div className="w-full flex gap-4 flex-wrap justify-center">
         {hero.length > 0 &&
           hero.map((prod: any, i: number) => {
             return <HeroProductCard key={i} {...prod} />;
@@ -191,7 +191,7 @@ export function ProductDetail({ details, isSearchLoading }: ProductProps) {
         <div className="text-xl font-bold max-w-[500px] ">{details.name}</div>
         <Button
           variant={"secondary"}
-          className="flex gap-2 py-6 w-fit  font-bold text-xl"
+          className="flex gap-2 py-6 w-fit  font-bold text-xl mx-auto sm:mx-0"
         >
           <div>Current price :</div>
           <div className="flex gap-1">
@@ -203,7 +203,7 @@ export function ProductDetail({ details, isSearchLoading }: ProductProps) {
         <Button
           onClick={handleTrack}
           variant={"destructive"}
-          className=" mt-auto text-xl font-bold w-32 h-12 mx-auto sm:mx-0"
+          className=" mt-auto text-xl font-bold w-32 h-12 mx-auto "
           disabled={isTrackLoading}
         >
           Track
