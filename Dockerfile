@@ -8,4 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-CMD [ "node", "index.js" ]
+RUN npm run build
+EXPOSE 3000
+
+CMD ["npm", "start"]
