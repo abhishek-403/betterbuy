@@ -1,13 +1,16 @@
-import {
-  formatDateTime,
-  formatPrice,
-} from "@/components/utils/auxifunctions";
+import { formatDateTime, formatPrice } from "@/components/utils/auxifunctions";
 import { generateEmail } from "@/components/utils/mailer";
 import { errorres, successres } from "@/components/utils/responseWrapper";
-import { HOST_AMAZON, HOST_FLIPKART, HOST_INVALID, HOST_NA } from "@/components/utils/type";
+import {
+  HOST_AMAZON,
+  HOST_FLIPKART,
+  HOST_INVALID,
+  HOST_NA,
+} from "@/components/utils/type";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import axios from "axios";
+import * as cheerio from "cheerio";
 
 async function handler(req: any, res: Response) {
   try {
@@ -15,8 +18,11 @@ async function handler(req: any, res: Response) {
     if (!key || !email) {
       return NextResponse.json(errorres(401, "Invalid Request"));
     }
-    
-    if (key !== process.env.UPDATE_PRODUCT_KEY || email !== process.env.ADMIN_EMAIL) {
+
+    if (
+      key !== process.env.UPDATE_PRODUCT_KEY ||
+      email !== process.env.ADMIN_EMAIL
+    ) {
       return NextResponse.json(errorres(401, "Invalid Parameters"));
     }
     const products = await prisma.product.findMany({ take: 4 });
@@ -24,9 +30,13 @@ async function handler(req: any, res: Response) {
     if (!products) {
       return NextResponse.json(errorres(401, "No product"));
     }
+    // console.log("prod",products);
+
     for (const product of products) {
       //fetching new prices
+      console.log("url ", product.url);
       const newprice = await getPrice(product.url);
+      console.log("pricenew ", newprice);
 
       if (!newprice) return NextResponse.json(errorres(401, "No new prices"));
 
@@ -103,7 +113,7 @@ async function handler(req: any, res: Response) {
   }
 }
 
-async function getPrice(url: string): Promise<number> {
+async function getPrice(url: string) {
   try {
     const host = getHost(url);
 
@@ -122,73 +132,35 @@ async function getPrice(url: string): Promise<number> {
   }
 }
 
-async function getAmazon(url: string): Promise<number> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: null,
-  });
+async function getAmazon(url: string) {
+  try {
+    const { data } = await axios.get(`${url}`);
+    const $ = cheerio.load(data);
+    let price2 = $(".a-price-whole").text().trim();
+    const fraction =
+      $(".a-price-fraction").text()[0] + $(".a-price-fraction").text()[1] ||
+      "00";
 
-  const page = await browser.newPage();
+    price2 = price2.replace(/,/g, "");
+    let price = parseInt(price2) + (parseInt(fraction) % 100) / 100;
 
-  await page.goto(url, {
-    waitUntil: "domcontentloaded",
-  });
-  const item = await page.evaluate(() => {
-    try {
-      const price = document.querySelector(".a-price-whole")?.textContent;
-      const fraction = document.querySelector(".a-price-fraction")?.textContent;
-
-      let tempprice = `${price}.${fraction}`;
-      if (price?.includes(".")) {
-        tempprice = `${price}${fraction}`;
-      }
-
-      return { price: tempprice };
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  await browser.close();
-
-  const strr = item!.price.replace(/,/g, "");
-  const price = parseFloat(strr);
-
-  return price;
+    return price;
+  } catch (e) {}
 }
-async function getFlipkart(url: string): Promise<number> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: null,
-  });
+async function getFlipkart(url: string) {
+  try {
+    const { data } = await axios.get(`${url}`);
+    const $ = cheerio.load(data);
+    const str = $(".Nx9bqj.CxhGGd").text().trim();
 
-  const page = await browser.newPage();
+    const strr = str!.slice(1).replace(/,/g, "");
+    const price = parseFloat(strr);
 
-  await page.goto(url, {
-    waitUntil: "domcontentloaded",
-  });
-  const item = await page.evaluate(() => {
-    try {
-      const itemDiv = document.querySelector(".C7fEHH");
-
-      const str = itemDiv!.querySelector(".Nx9bqj.CxhGGd")?.textContent;
-
-      return { str };
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  await browser.close();
-  const str = item?.str;
-
-  const strr = str!.slice(1).replace(/,/g, "");
-  const price = parseFloat(strr);
-
-  return price;
+    return price;
+  } catch (e) {}
 }
 
-function getHost(url:string):string {
+function getHost(url: string): string {
   try {
     const parsedUrl = new URL(url);
     const hostname = parsedUrl.hostname;
@@ -203,6 +175,6 @@ function getHost(url:string):string {
   } catch (error) {
     return HOST_INVALID;
   }
-};
+}
 
 export { handler as POST };

@@ -80,13 +80,16 @@ export default function Hero({}: Props) {
           </Button>
         </div>
       </div>
-      {/* <Button
+      <Button
         onClick={async () => {
-          const a = await axios.get("/api/updateproduct");
+          const a = await axios.post("/api/updateproduct", {
+            key: "akljeoiwcnigohrn293nk219dejkf2",
+            email: "abhishek605404@gmail.com",
+          });
         }}
       >
         update
-      </Button> */}
+      </Button>
       <div className="flex flex-col gap-6 mt-4 sm:mt-10">
         <ProductDetail isSearchLoading={isSearchLoading} details={details} />
         <HeroProducts />
