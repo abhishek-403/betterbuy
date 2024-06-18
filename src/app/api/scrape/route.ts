@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { errorres, successres } from "@/components/utils/responseWrapper";
 import {
   HOST_AMAZON,
@@ -6,11 +5,13 @@ import {
   HOST_INVALID,
   HOST_NA,
 } from "@/components/utils/type";
+import axios from "axios";
+import * as cheerio from "cheerio";
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+
 async function handler(req: Request, res: Response) {
   try {
-    const { url }: string = await req.json();
+    const { url } = await req.json();
     const host = getHost(url);
 
     const parsedUrl = new URLSearchParams(new URL(url).search);
@@ -43,51 +44,29 @@ async function handler(req: Request, res: Response) {
 
 async function getAmazon(url: string) {
   try {
-    // const browser = await puppeteer.launch({
-    //   headless: true,
-    //   defaultViewport: null,
-    // });
+    const { data } = await axios.get(`${url}`);
+    const $ = cheerio.load(data);
+    const name = $("#productTitle").text().trim();
 
-    const browser = await getBrowser();
-    const page = await browser.newPage();
+    const currency = $(".a-price-symbol").text().trim()[0];
+    let price2 = $(".a-price-whole").text().trim();
+    const fraction =
+      $(".a-price-fraction").text()[0] + $(".a-price-fraction").text()[1] ||
+      "00";
 
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
-    });
-    const item = await page.evaluate(() => {
-      try {
-        const name = document.querySelector("#productTitle")?.textContent;
-
-        const currency = document.querySelector(".a-price-symbol")?.textContent;
-        const price = document.querySelector(".a-price-whole")?.textContent;
-        const fraction =
-          document.querySelector(".a-price-fraction")?.textContent;
-
-        const images = document.querySelectorAll("#landingImage");
-
-        const img = Array.from(images).map((img) => img.src);
-
-        let tempprice = `${price}.${fraction}`;
-        if (price?.includes(".")) {
-          tempprice = `${price}${fraction}`;
-        }
-
-        return { name, price: tempprice, currency, img: img[0] };
-      } catch (error) {
-        console.log(error);
-      }
+    let img;
+    $("#landingImage").each((i, ele) => {
+      img = $(ele).attr("src");
     });
 
-    await browser.close();
-
-    const strr = item!.price.replace(/,/g, "");
-    const price = parseFloat(strr);
-
+    price2 = price2.replace(/,/g, "");
+    let price = parseInt(price2) + (parseInt(fraction) % 100) / 100;
+    
     const itemFinal = {
-      name: item?.name,
-      image: item?.img,
+      name: name,
+      image: img,
       price,
-      currency: item?.currency,
+      currency: currency,
       provider: HOST_AMAZON,
     };
 
@@ -99,36 +78,15 @@ async function getAmazon(url: string) {
 
 async function getFlipkart(url: string) {
   try {
-    // const browser = await puppeteer.launch({
-    //   headless: true,
-    //   defaultViewport: null,
-    // });
-    const browser = await getBrowser();
-    const page = await browser.newPage();
+    const { data } = await axios.get(`${url}`);
+    const $ = cheerio.load(data);
 
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
+    const name = $(".VU-ZEz").text().trim();
+    const str = $(".Nx9bqj.CxhGGd").text().trim();
+    let img;
+    $(".DByuf4.IZexXJ.jLEJ7H").each((i, ele) => {
+      img = $(ele).attr("src");
     });
-    const item = await page.evaluate(() => {
-      try {
-        const itemDiv = document.querySelector(".C7fEHH");
-
-        const name = itemDiv!.querySelector(".VU-ZEz")?.textContent;
-
-        const str = itemDiv!.querySelector(".Nx9bqj.CxhGGd")?.textContent;
-
-        const images = document.querySelectorAll(".DByuf4.IZexXJ.jLEJ7H");
-
-        const img = Array.from(images).map((img) => img.src);
-
-        return { name, str, img: img[0] };
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    await browser.close();
-    const str = item?.str;
     let currency;
     if (str!.charAt(0) === "$" || str!.charAt(0) === "₹") {
       currency = str!.charAt(0);
@@ -137,11 +95,12 @@ async function getFlipkart(url: string) {
     const price = parseFloat(strr);
     const itemFinal = {
       provider: HOST_FLIPKART,
-      name: item?.name,
-      image: item?.img,
+      name: name,
+      image: img,
       price,
       currency,
     };
+
 
     return itemFinal;
   } catch (e) {}
@@ -164,19 +123,4 @@ function getHost(url: string): string {
   }
 }
 
-async function getBrowser() {
-  const browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? process.env.PUPPETEER_EXECUTABLE_PATH
-        : puppeteer.executablePath(),
-  });
-  return browser;
-}
 export { handler as POST };
