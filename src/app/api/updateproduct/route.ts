@@ -30,13 +30,10 @@ async function handler(req: any, res: Response) {
     if (!products) {
       return NextResponse.json(errorres(401, "No product"));
     }
-    // console.log("prod",products);
 
     for (const product of products) {
       //fetching new prices
-      console.log("url ", product.url);
       const newprice = await getPrice(product.url);
-      console.log("pricenew ", newprice);
 
       if (!newprice) return NextResponse.json(errorres(401, "No new prices"));
 
